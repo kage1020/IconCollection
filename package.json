@@ -1,0 +1,8 @@
+{
+  "name": "icon-collection",
+  "version": "1.0.0",
+  "description": "This repository contains a collection of icon packages and icon parsers.",
+  "main": "index.js",
+  "author": "kage1020",
+  "license": "MIT"
+}
