@@ -2,7 +2,12 @@
   "name": "icon-collection",
   "version": "1.0.0",
   "description": "This repository contains a collection of icon packages and icon parsers.",
-  "main": "index.js",
   "author": "kage1020",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "^22.1.0",
+    "mxgraph": "^4.2.2",
+    "react-icons": "^4.9.0",
+    "yargs": "^17.7.2"
+  }
 }
