@@ -74,10 +74,19 @@ for (const lib of libs) {
   });
   bar.remove(iconBar);
 
-  if (icons.length > 1000) {
+  const icons_size = icons.reduce((sum, icon) => sum + icon.xml.length, 0);
+  if (icons_size > 3000 * 1024) {
+    const chunks_index = icons.reduce(
+      (acc, cur) => [
+        acc[0] + cur.xml.length,
+        [...acc[1], Math.floor((acc[0] + cur.xml.length) / (2800 * 1024))],
+      ],
+      [0, []]
+    )[1];
+    const chunk_count = Math.max(...chunks_index) + 1;
     const chunks = [];
-    for (let i = 0; i < icons.length; i += 1000) {
-      chunks.push(icons.slice(i, i + 1000));
+    for (const i of Array(chunk_count).keys()) {
+      chunks.push(icons.filter((_, j) => chunks_index[j] === i));
     }
 
     for (let i = 0; i < chunks.length; i++) {
@@ -86,7 +95,8 @@ for (const lib of libs) {
         '<mxlibrary>' + JSON.stringify(chunks[i]) + '</mxlibrary>'
       );
     }
-  } else
+  } else {
     fs.writeFileSync(`./out/mx/${lib}.xml`, '<mxlibrary>' + JSON.stringify(icons) + '</mxlibrary>');
+  }
 }
 bar.stop();
