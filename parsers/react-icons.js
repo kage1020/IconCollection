@@ -87,9 +87,6 @@ const constructSVG = (svgEl, data) => {
         return svgEl;
     }
 
-    shapeEl.setAttribute('fill', props.fill ?? 'none');
-    shapeEl.setAttribute('stroke', props.stroke ?? 'none');
-    shapeEl.setAttribute('stroke-width', props.strokeWidth ?? '1');
     svgEl.appendChild(shapeEl);
   } else {
     const children = props.children || props.child;
@@ -137,6 +134,9 @@ for (const lib of libs) {
     svgEl.setAttribute('viewBox', data.props.attr.viewBox);
 
     svgEl = constructSVG(svgEl, data);
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = 'path { fill: black; stroke: none; stroke-width: 1; }';
+    svgEl.appendChild(styleEl);
 
     const filename = key.replace(
       new RegExp(`^${libName}Outline(\\S+)$|^${libName}Fill(\\S+)$|^${libName}(\\S+)$`),

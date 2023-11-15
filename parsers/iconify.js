@@ -43,6 +43,9 @@ for (const [lib, value] of Object.entries(json)) {
       `0 0 ${body.width ?? icons.width ?? 16} ${body.height ?? icons.height ?? 16}`
     );
     svgEl.innerHTML = body.body;
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = 'path { fill: black; stroke: none; stroke-width: 1; }';
+    svgEl.appendChild(styleEl);
 
     fs.writeFileSync(`./out/svg/${title}/${key}.svg`, svgEl.outerHTML);
   }

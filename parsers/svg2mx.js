@@ -59,7 +59,7 @@ for (const lib of libs) {
 
     const title = file.replace(/\.svg$/, '');
     const image = 'data:image/svg+xml,' + Buffer.from(svg).toString('base64');
-    const style = mxUtils.setStyle(defaultStyle, mxConstants.STYLE_IMAGE, image);
+    const style = mxUtils.setStyle(defaultStyle, mxConstants.STYLE_IMAGE, image) + 'editableCssRules=.*;';
 
     const graph = new mxGraph();
     const parent = graph.getDefaultParent();
