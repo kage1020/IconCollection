@@ -44,7 +44,8 @@ for (const [lib, value] of Object.entries(json)) {
     );
     svgEl.innerHTML = body.body;
     const styleEl = document.createElement('style');
-    styleEl.innerHTML = 'path { fill: black; stroke: none; stroke-width: 1; }';
+    styleEl.innerHTML =
+      'g { stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2 }';
     svgEl.appendChild(styleEl);
 
     fs.writeFileSync(`./out/svg/${title}/${key}.svg`, svgEl.outerHTML);

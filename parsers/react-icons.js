@@ -135,7 +135,7 @@ for (const lib of libs) {
 
     svgEl = constructSVG(svgEl, data);
     const styleEl = document.createElement('style');
-    styleEl.innerHTML = 'path { fill: black; stroke: none; stroke-width: 1; }';
+    styleEl.innerHTML = 'svg { stroke: currentColor; fill: currentColor; stroke-width: 0; }';
     svgEl.appendChild(styleEl);
 
     const filename = key.replace(

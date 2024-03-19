@@ -59,7 +59,8 @@ for (const lib of libs) {
 
     const title = file.replace(/\.svg$/, '');
     const image = 'data:image/svg+xml,' + Buffer.from(svg).toString('base64');
-    const style = mxUtils.setStyle(defaultStyle, mxConstants.STYLE_IMAGE, image) + 'editableCssRules=.*;';
+    const style =
+      mxUtils.setStyle(defaultStyle, mxConstants.STYLE_IMAGE, image) + 'editableCssRules=.*;';
 
     const graph = new mxGraph();
     const parent = graph.getDefaultParent();
@@ -75,7 +76,7 @@ for (const lib of libs) {
   bar.remove(iconBar);
 
   const icons_size = icons.reduce((sum, icon) => sum + icon.xml.length, 0);
-  if (icons_size > 3000 * 1024) {
+  if (icons_size > 2800 * 1024) {
     const chunks_index = icons.reduce(
       (acc, cur) => [
         acc[0] + cur.xml.length,
