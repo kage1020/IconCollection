@@ -32,6 +32,69 @@ const libs = [
   { key: 'Wi', name: 'Weather Icons' },
 ];
 
+function modifySvg(svgEl) {
+  const parent = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  parent.innerHTML = svgEl;
+  const pathFills = parent.querySelectorAll('path[fill="currentColor"]');
+  const pathStrokes = parent.querySelectorAll('path[stroke="currentColor"]');
+  const gFills = parent.querySelectorAll('g[fill="currentColor"]');
+  const gStrokes = parent.querySelectorAll('g[stroke="currentColor"]');
+  const rectFills = parent.querySelectorAll('rect[fill="currentColor"]');
+  const rectStrokes = parent.querySelectorAll('rect[stroke="currentColor"]');
+
+  let counter = 0;
+  const pathFillStyle = document.createElement('style');
+  for (const path of pathFills) {
+    path.classList.add(`p${counter}`);
+    pathFillStyle.innerHTML += `.p${counter} { fill: currentColor }`;
+    counter++;
+  }
+  if (pathFills.length > 0) parent.appendChild(pathFillStyle);
+  const pathStrokeStyle = document.createElement('style');
+  for (const path of pathStrokes) {
+    path.classList.add(`p${counter}`);
+    pathStrokeStyle.innerHTML += `.p${counter} { stroke: currentColor }`;
+    counter++;
+  }
+  if (pathStrokes.length > 0) parent.appendChild(pathStrokeStyle);
+  counter = 0;
+  const gFillStyle = document.createElement('style');
+  for (const g of gFills) {
+    g.classList.add(`g${counter}`);
+    gFillStyle.innerHTML += `.g${counter} { fill: currentColor }`;
+    counter++;
+  }
+  if (gFills.length > 0) parent.appendChild(gFillStyle);
+  const gStrokeStyle = document.createElement('style');
+  for (const g of gStrokes) {
+    g.classList.add(`g${counter}`);
+    gStrokeStyle.innerHTML += `.g${counter} { stroke: currentColor }`;
+    counter++;
+  }
+  if (gStrokes.length > 0) parent.appendChild(gStrokeStyle);
+  counter = 0;
+  const rectFillStyle = document.createElement('style');
+  for (const rect of rectFills) {
+    rect.classList.add(`r${counter}`);
+    rectFillStyle.innerHTML += `.r${counter} { fill: currentColor }`;
+    counter++;
+  }
+  if (rectFills.length > 0) parent.appendChild(rectFillStyle);
+  const rectStrokeStyle = document.createElement('style');
+  for (const rect of rectStrokes) {
+    rect.classList.add(`r${counter}`);
+    rectStrokeStyle.innerHTML += `.r${counter} { stroke: currentColor }`;
+    counter++;
+  }
+  if (rectStrokes.length > 0) parent.appendChild(rectStrokeStyle);
+
+  const style = document.createElement('style');
+  style.innerHTML = `path { fill: currentColor; stroke: currentColor; }`;
+  parent.appendChild(style);
+
+  return parent.outerHTML;
+}
+
 const constructSVG = (svgEl, data) => {
   const { type, props } = data;
 
@@ -119,11 +182,14 @@ for (const lib of libs) {
 
   const icons = require(`react-icons/${lib.key.toLowerCase()}`);
 
-  if (fs.existsSync(`./out/svg/${lib.name}`)) continue;
+  if (fs.existsSync(`./out/svg/${lib.name.replace(/\s/g, '')}`)) continue;
   const libName = `${lib.key.replace(/[0-9]/g, '')}`;
+  fs.mkdirSync(`./out/svg/${lib.name.replace(/\s/g, '')}`, { recursive: true });
 
-  const iconBar = bar.create(Object.entries(icons).length, 0, { name: lib.name });
-  iconBar.start(Object.entries(icons).length, 0, { name: lib.name });
+  const iconBar = bar.create(Object.entries(icons).length, 0, {
+    name: lib.name.replace(/\s/g, ''),
+  });
+  iconBar.start(Object.entries(icons).length, 0, { name: lib.name.replace(/\s/g, '') });
   for (const [key, maker] of Object.entries(icons)) {
     iconBar.increment();
     bar.update();
@@ -131,19 +197,19 @@ for (const lib of libs) {
     let svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     const data = maker();
     svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgEl.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    svgEl.setAttribute('version', '1.1');
     svgEl.setAttribute('viewBox', data.props.attr.viewBox);
 
     svgEl = constructSVG(svgEl, data);
-    const styleEl = document.createElement('style');
-    styleEl.innerHTML = 'svg { stroke: currentColor; fill: currentColor; stroke-width: 0; }';
-    svgEl.appendChild(styleEl);
+    svgEl.innerHTML += modifySvg(svgEl.innerHTML);
 
     const filename = key.replace(
       new RegExp(`^${libName}Outline(\\S+)$|^${libName}Fill(\\S+)$|^${libName}(\\S+)$`),
       '$1$2$3'
     );
-    fs.mkdirSync(`./out/svg/${lib.name}`, { recursive: true });
-    fs.writeFileSync(`./out/svg/${lib.name}/${filename}.svg`, svgEl.outerHTML);
+
+    fs.writeFileSync(`./out/svg/${lib.name.replace(/\s/g, '')}/${filename}.svg`, svgEl.outerHTML);
   }
   bar.remove(iconBar);
 }
