@@ -111,6 +111,7 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
             padding: 0.5rem;
             cursor: pointer;
             border-radius: 0.25rem;
+            transition: 0.5s;
           }
           #icon-item button:hover {
             color: rgba(255, 255, 255, 0.8);
@@ -121,6 +122,7 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            color: var(--vscode-foreground);
           }
           #icon-wrapper svg {
             width: 50px;

@@ -2,7 +2,7 @@
   "name": "icon-collection",
   "displayName": "Icon Collection",
   "description": "Viewer of icon library with SVG.",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -31,7 +31,7 @@
         {
           "id": "IconCollection",
           "title": "Icon Collection",
-          "icon": "https://icons.kage1020.com/icon.drawio.svg"
+          "icon": "./dist/icon.svg"
         }
       ]
     }
