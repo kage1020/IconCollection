@@ -31,3 +31,7 @@ Clear previous request when typing.
 ## 0.0.7
 
 Fix diagram text.
+
+## 0.1.0
+
+Fix diagram's width and height.

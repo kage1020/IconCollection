@@ -16,9 +16,9 @@ This is a collection of library icons for use in VSCode. This extension provides
 
 ## Release Notes
 
-### 0.0.7
+### 0.1.0
 
-Fix diagram text.
+Fix diagram's width and height.
 
 ## Acknowledgements
 

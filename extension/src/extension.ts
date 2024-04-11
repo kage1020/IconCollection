@@ -57,8 +57,8 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           url = `https://icons.kage1020.com/${data.value.collection}/${data.value.name}.svg`;
           svg = await fetch(url).then((res) => res.text());
           const base64Svg = btoa(svg);
-          const width = svg.match(/<svg[^>]*width="([^"]*)"[^>]*>/)?.[1] || 100;
-          const height = svg.match(/<svg[^>]*height="([^"]*)"[^>]*>/)?.[1] || 100;
+          const width = svg.match(/viewBox="0 0 (\d+) (\d+)"/)?.[1] || 100;
+          const height = svg.match(/viewBox="0 0 (\d+) (\d+)"/)?.[2] || 100;
           const diagram = `<mxGraphModel><root><mxCell id="0" /><mxCell id="1" parent="0" /><mxCell id="2" style="shape=image;verticalAlign=top;aspect=fixed;imageAspect=0;editableCssRules=.*;image=data:image/svg+xml,${base64Svg};" vertex="1" parent="1"><mxGeometry x="0" y="0" width="${width}" height="${height}" as="geometry" /></mxCell></root></mxGraphModel>`;
           vscode.env.clipboard.writeText(diagram);
           vscode.window.showInformationMessage('Copied to clipboard!');
