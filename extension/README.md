@@ -16,17 +16,9 @@ This is a collection of library icons for use in VSCode. This extension provides
 
 ## Release Notes
 
-### 0.0.1
+### 0.0.7
 
-Initial release of Icon Collection.
-
-### 0.0.2
-
-Fix icon path on activity bar.
-
-### 0.0.3
-
-Fix UI for icon list.
+Fix diagram text.
 
 ## Acknowledgements
 

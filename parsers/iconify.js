@@ -6,8 +6,12 @@ const json = JSON.parse(fs.readFileSync('node_modules/@iconify/json/collections.
 
 const { document } = new JSDOM('<!DOCTYPE html><html><body></body></html>').window;
 
+function createElementNS(elementType) {
+  return document.createElementNS('http://www.w3.org/2000/svg', elementType);
+}
+
 function modifySvg(svgEl) {
-  const parent = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const parent = createElementNS('g');
   parent.innerHTML = svgEl;
   const pathFills = parent.querySelectorAll('path[fill="currentColor"]');
   const pathStrokes = parent.querySelectorAll('path[stroke="currentColor"]');
@@ -82,7 +86,7 @@ for (const [lib, value] of Object.entries(json)) {
   libBar.increment();
   bar.update();
 
-  const title = value.name.replace('Devicon', 'Devicons');
+  const title = value.name;
   if (fs.existsSync(`./out/svg/${title.replace(/\s/g, '')}`)) continue;
 
   fs.mkdirSync(`./out/svg/${title.replace(/\s/g, '')}`, { recursive: true });
@@ -97,10 +101,8 @@ for (const [lib, value] of Object.entries(json)) {
     iconBar.increment();
     bar.update();
 
-    const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const svgEl = createElementNS('svg');
     svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svgEl.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    svgEl.setAttribute('version', '1.1');
     svgEl.setAttribute(
       'viewBox',
       `0 0 ${body.width ?? icons.width ?? 16} ${body.height ?? icons.height ?? 16}`

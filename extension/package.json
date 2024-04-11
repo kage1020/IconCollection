@@ -2,7 +2,7 @@
   "name": "icon-collection",
   "displayName": "Icon Collection",
   "description": "Viewer of icon library with SVG.",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -16,6 +16,7 @@
   },
   "license": "Apache-2.0",
   "publisher": "kage1020",
+  "icon": "./images/icon.png",
   "contributes": {
     "views": {
       "IconCollection": [
@@ -31,7 +32,7 @@
         {
           "id": "IconCollection",
           "title": "Icon Collection",
-          "icon": "./dist/icon.svg"
+          "icon": "./images/icon.svg"
         }
       ]
     }

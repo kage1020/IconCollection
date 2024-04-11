@@ -32,130 +32,97 @@ const libs = [
   { key: 'Wi', name: 'Weather Icons' },
 ];
 
-function modifySvg(svgEl) {
-  const parent = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  parent.innerHTML = svgEl;
-  const pathFills = parent.querySelectorAll('path[fill="currentColor"]');
-  const pathStrokes = parent.querySelectorAll('path[stroke="currentColor"]');
-  const gFills = parent.querySelectorAll('g[fill="currentColor"]');
-  const gStrokes = parent.querySelectorAll('g[stroke="currentColor"]');
-  const rectFills = parent.querySelectorAll('rect[fill="currentColor"]');
-  const rectStrokes = parent.querySelectorAll('rect[stroke="currentColor"]');
+function createElementNS(elementType) {
+  return document.createElementNS('http://www.w3.org/2000/svg', elementType);
+}
+
+function modifySvg(childrenEl) {
+  const parent = createElementNS('g');
+  parent.innerHTML = childrenEl;
+  const paths = parent.querySelectorAll('path');
+  const gs = parent.querySelectorAll('g');
+  const rects = parent.querySelectorAll('rect');
 
   let counter = 0;
   const pathFillStyle = document.createElement('style');
-  for (const path of pathFills) {
+  for (const path of paths) {
     path.classList.add(`p${counter}`);
-    pathFillStyle.innerHTML += `.p${counter} { fill: currentColor }`;
-    counter++;
+    pathFillStyle.innerHTML += `.p${counter} { fill: ${
+      path.getAttribute('fill') || 'currentColor'
+    } }`;
   }
-  if (pathFills.length > 0) parent.appendChild(pathFillStyle);
+  if (paths.length > 0) parent.appendChild(pathFillStyle);
+  counter = 0;
   const pathStrokeStyle = document.createElement('style');
-  for (const path of pathStrokes) {
+  for (const path of paths) {
     path.classList.add(`p${counter}`);
-    pathStrokeStyle.innerHTML += `.p${counter} { stroke: currentColor }`;
-    counter++;
+    pathStrokeStyle.innerHTML += `.p${counter} { stroke: ${
+      path.getAttribute('stroke') || 'currentColor'
+    } }`;
   }
-  if (pathStrokes.length > 0) parent.appendChild(pathStrokeStyle);
+  if (paths.length > 0) parent.appendChild(pathStrokeStyle);
+
   counter = 0;
   const gFillStyle = document.createElement('style');
-  for (const g of gFills) {
+  for (const g of gs) {
     g.classList.add(`g${counter}`);
-    gFillStyle.innerHTML += `.g${counter} { fill: currentColor }`;
-    counter++;
+    gFillStyle.innerHTML += `.g${counter} { fill: ${g.getAttribute('fill') || 'currentColor'} }`;
   }
-  if (gFills.length > 0) parent.appendChild(gFillStyle);
+  if (gs.length > 0) parent.appendChild(gFillStyle);
+  counter = 0;
   const gStrokeStyle = document.createElement('style');
-  for (const g of gStrokes) {
+  for (const g of gs) {
     g.classList.add(`g${counter}`);
-    gStrokeStyle.innerHTML += `.g${counter} { stroke: currentColor }`;
-    counter++;
+    gStrokeStyle.innerHTML += `.g${counter} { stroke: ${
+      g.getAttribute('stroke') || 'currentColor'
+    } }`;
   }
-  if (gStrokes.length > 0) parent.appendChild(gStrokeStyle);
+  if (gs.length > 0) parent.appendChild(gStrokeStyle);
+
   counter = 0;
   const rectFillStyle = document.createElement('style');
-  for (const rect of rectFills) {
+  for (const rect of rects) {
     rect.classList.add(`r${counter}`);
-    rectFillStyle.innerHTML += `.r${counter} { fill: currentColor }`;
-    counter++;
+    rectFillStyle.innerHTML += `.r${counter} { fill: ${
+      rect.getAttribute('fill') || 'currentColor'
+    } }`;
   }
-  if (rectFills.length > 0) parent.appendChild(rectFillStyle);
+  if (rects.length > 0) parent.appendChild(rectFillStyle);
+  counter = 0;
   const rectStrokeStyle = document.createElement('style');
-  for (const rect of rectStrokes) {
+  for (const rect of rects) {
     rect.classList.add(`r${counter}`);
-    rectStrokeStyle.innerHTML += `.r${counter} { stroke: currentColor }`;
-    counter++;
+    rectStrokeStyle.innerHTML += `.r${counter} { stroke: ${
+      rect.getAttribute('stroke') || 'currentColor'
+    } }`;
   }
-  if (rectStrokes.length > 0) parent.appendChild(rectStrokeStyle);
-
-  const style = document.createElement('style');
-  style.innerHTML = `path { fill: currentColor; stroke: currentColor; }`;
-  parent.appendChild(style);
+  if (rects.length > 0) parent.appendChild(rectStrokeStyle);
 
   return parent.outerHTML;
 }
 
 const constructSVG = (svgEl, data) => {
-  const { type, props } = data;
+  const { attr, child, children, ...props } = data.props;
 
-  if (!props.children && !props.child) {
-    const createElementNS = (elementType) =>
-      document.createElementNS('http://www.w3.org/2000/svg', elementType);
-
-    let shapeEl;
-
-    switch (type) {
-      case 'path':
-        shapeEl = createElementNS('path');
-        shapeEl.setAttribute('d', props.d);
-        break;
-      case 'circle':
-        shapeEl = createElementNS('circle');
-        shapeEl.setAttribute('cx', props.cx);
-        shapeEl.setAttribute('cy', props.cy);
-        shapeEl.setAttribute('r', props.r);
-        break;
-      case 'rect':
-        shapeEl = createElementNS('rect');
-        shapeEl.setAttribute('width', props.width);
-        shapeEl.setAttribute('height', props.height);
-        shapeEl.setAttribute('x', props.x);
-        shapeEl.setAttribute('y', props.y);
-        shapeEl.setAttribute('rx', props.rx);
-        break;
-      case 'ellipse':
-        shapeEl = createElementNS('ellipse');
-        shapeEl.setAttribute('cx', props.cx);
-        shapeEl.setAttribute('cy', props.cy);
-        shapeEl.setAttribute('rx', props.rx);
-        shapeEl.setAttribute('ry', props.ry);
-        break;
-      case 'polygon':
-        shapeEl = createElementNS('polygon');
-        shapeEl.setAttribute('points', props.points);
-        break;
-      case 'line':
-        shapeEl = createElementNS('line');
-        shapeEl.setAttribute('x1', props.x1);
-        shapeEl.setAttribute('y1', props.y1);
-        shapeEl.setAttribute('x2', props.x2);
-        shapeEl.setAttribute('y2', props.y2);
-        shapeEl.setAttribute('stroke-linecap', props.strokeLinecap ?? 'round');
-        break;
-      case 'polyline':
-        shapeEl = createElementNS('polyline');
-        shapeEl.setAttribute('points', props.points);
-        break;
-      default:
-        return svgEl;
+  if (attr) {
+    for (const [key, value] of Object.entries(attr)) {
+      svgEl.setAttribute(key, value);
     }
+  }
 
-    svgEl.appendChild(shapeEl);
+  if (child || children) {
+    for (const c of child || children) {
+      svgEl = constructSVG(svgEl, c);
+    }
   } else {
-    const children = props.children || props.child;
-    for (const child of children) {
-      svgEl = constructSVG(svgEl, child);
+    const { type, props } = data;
+    const el = createElementNS(type);
+
+    for (const [key, value] of Object.entries(props)) {
+      if (!value) continue;
+      el.setAttribute(key, value);
     }
+    svgEl.appendChild(el);
   }
 
   return svgEl;
@@ -194,15 +161,14 @@ for (const lib of libs) {
     iconBar.increment();
     bar.update();
 
-    let svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let svgEl = createElementNS('svg');
     const data = maker();
     svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svgEl.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    svgEl.setAttribute('version', '1.1');
-    svgEl.setAttribute('viewBox', data.props.attr.viewBox);
+    svgEl.setAttribute('width', '1rem');
+    svgEl.setAttribute('height', '1rem');
 
     svgEl = constructSVG(svgEl, data);
-    svgEl.innerHTML += modifySvg(svgEl.innerHTML);
+    svgEl.innerHTML = modifySvg(svgEl.innerHTML);
 
     const filename = key.replace(
       new RegExp(`^${libName}Outline(\\S+)$|^${libName}Fill(\\S+)$|^${libName}(\\S+)$`),
