@@ -46,55 +46,55 @@ function modifySvg(childrenEl) {
   let counter = 0;
   const pathFillStyle = document.createElement('style');
   for (const path of paths) {
-    path.classList.add(`p${counter}`);
-    pathFillStyle.innerHTML += `.p${counter} { fill: ${
+    path.classList.add(`p${counter}-fill`);
+    pathFillStyle.innerHTML += `.p${counter}-fill{fill:${
       path.getAttribute('fill') || 'currentColor'
-    } }`;
+    }}`;
   }
   if (paths.length > 0) parent.appendChild(pathFillStyle);
   counter = 0;
   const pathStrokeStyle = document.createElement('style');
   for (const path of paths) {
-    path.classList.add(`p${counter}`);
-    pathStrokeStyle.innerHTML += `.p${counter} { stroke: ${
+    path.classList.add(`p${counter}-stroke`);
+    pathStrokeStyle.innerHTML += `.p${counter}-stroke{stroke:${
       path.getAttribute('stroke') || 'currentColor'
-    } }`;
+    }}`;
   }
   if (paths.length > 0) parent.appendChild(pathStrokeStyle);
 
   counter = 0;
   const gFillStyle = document.createElement('style');
   for (const g of gs) {
-    g.classList.add(`g${counter}`);
-    gFillStyle.innerHTML += `.g${counter} { fill: ${g.getAttribute('fill') || 'currentColor'} }`;
+    g.classList.add(`g${counter}-fill`);
+    gFillStyle.innerHTML += `.g${counter}-fill{fill:${g.getAttribute('fill') || 'currentColor'}}`;
   }
   if (gs.length > 0) parent.appendChild(gFillStyle);
   counter = 0;
   const gStrokeStyle = document.createElement('style');
   for (const g of gs) {
-    g.classList.add(`g${counter}`);
-    gStrokeStyle.innerHTML += `.g${counter} { stroke: ${
+    g.classList.add(`g${counter}-stroke`);
+    gStrokeStyle.innerHTML += `.g${counter}-stroke{stroke:${
       g.getAttribute('stroke') || 'currentColor'
-    } }`;
+    }}`;
   }
   if (gs.length > 0) parent.appendChild(gStrokeStyle);
 
   counter = 0;
   const rectFillStyle = document.createElement('style');
   for (const rect of rects) {
-    rect.classList.add(`r${counter}`);
-    rectFillStyle.innerHTML += `.r${counter} { fill: ${
+    rect.classList.add(`r${counter}-fill`);
+    rectFillStyle.innerHTML += `.r${counter}-fill{fill:${
       rect.getAttribute('fill') || 'currentColor'
-    } }`;
+    }}`;
   }
   if (rects.length > 0) parent.appendChild(rectFillStyle);
   counter = 0;
   const rectStrokeStyle = document.createElement('style');
   for (const rect of rects) {
-    rect.classList.add(`r${counter}`);
-    rectStrokeStyle.innerHTML += `.r${counter} { stroke: ${
+    rect.classList.add(`r${counter}-stroke`);
+    rectStrokeStyle.innerHTML += `.r${counter}-stroke{stroke:${
       rect.getAttribute('stroke') || 'currentColor'
-    } }`;
+    }}`;
   }
   if (rects.length > 0) parent.appendChild(rectStrokeStyle);
 

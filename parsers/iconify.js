@@ -23,45 +23,45 @@ function modifySvg(svgEl) {
   let counter = 0;
   const pathFillStyle = document.createElement('style');
   for (const path of pathFills) {
-    path.classList.add(`p${counter}`);
-    pathFillStyle.innerHTML += `.p${counter} { fill: currentColor }`;
+    path.classList.add(`p${counter}-fill`);
+    pathFillStyle.innerHTML += `.p${counter}-fill{fill:currentColor}`;
     counter++;
   }
   if (pathFills.length > 0) parent.appendChild(pathFillStyle);
   const pathStrokeStyle = document.createElement('style');
   for (const path of pathStrokes) {
-    path.classList.add(`p${counter}`);
-    pathStrokeStyle.innerHTML += `.p${counter} { stroke: currentColor }`;
+    path.classList.add(`p${counter}-stroke`);
+    pathStrokeStyle.innerHTML += `.p${counter}-stroke{stroke:currentColor}`;
     counter++;
   }
   if (pathStrokes.length > 0) parent.appendChild(pathStrokeStyle);
   counter = 0;
   const gFillStyle = document.createElement('style');
   for (const g of gFills) {
-    g.classList.add(`g${counter}`);
-    gFillStyle.innerHTML += `.g${counter} { fill: currentColor }`;
+    g.classList.add(`g${counter}-fill`);
+    gFillStyle.innerHTML += `.g${counter}-fill{fill:currentColor}`;
     counter++;
   }
   if (gFills.length > 0) parent.appendChild(gFillStyle);
   const gStrokeStyle = document.createElement('style');
   for (const g of gStrokes) {
-    g.classList.add(`g${counter}`);
-    gStrokeStyle.innerHTML += `.g${counter} { stroke: currentColor }`;
+    g.classList.add(`g${counter}-stroke`);
+    gStrokeStyle.innerHTML += `.g${counter}-stroke{stroke:currentColor}`;
     counter++;
   }
   if (gStrokes.length > 0) parent.appendChild(gStrokeStyle);
   counter = 0;
   const rectFillStyle = document.createElement('style');
   for (const rect of rectFills) {
-    rect.classList.add(`r${counter}`);
-    rectFillStyle.innerHTML += `.r${counter} { fill: currentColor }`;
+    rect.classList.add(`r${counter}-fill`);
+    rectFillStyle.innerHTML += `.r${counter}-fill{fill:currentColor}`;
     counter++;
   }
   if (rectFills.length > 0) parent.appendChild(rectFillStyle);
   const rectStrokeStyle = document.createElement('style');
   for (const rect of rectStrokes) {
-    rect.classList.add(`r${counter}`);
-    rectStrokeStyle.innerHTML += `.r${counter} { stroke: currentColor }`;
+    rect.classList.add(`r${counter}-stroke`);
+    rectStrokeStyle.innerHTML += `.r${counter}-stroke{stroke:currentColor}`;
     counter++;
   }
   if (rectStrokes.length > 0) parent.appendChild(rectStrokeStyle);
