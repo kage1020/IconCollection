@@ -30,16 +30,16 @@ then, you can get svg icons and mxlibrary file with running `parsers/*.js`.
 
 ## Icon Packages
 
-### [react-icons@4.9.0](https://react-icons.github.io/react-icons)
+### [react-icons@6.2.1](https://react-icons.github.io/react-icons)
 
 | License | Icons |
 | --- | --- |
-|MIT|[Ant Design Icons](https://github.com/ant-design/ant-design-icons), [Bootstrap Icons](https://github.com/twbs/icons), [Devicons](https://vorillaz.github.io/devicons/), [Feather](https://feathericons.com/), [Flat Color Icons](https://github.com/icons8/flat-color-icons), [Github Octicons icons](https://octicons.github.com/), [Heroicons](https://github.com/tailwindlabs/heroicons), [Heroicons 2](https://github.com/tailwindlabs/heroicons), [Ionicons 4](https://ionicons.com/), [Ionicons 5](https://ionicons.com/), [Radix Icons](https://icons.radix-ui.com/), [Simple Line Icons](https://thesabbir.github.io/simple-line-icons/), [Tabler Icons](https://github.com/tabler/tabler-icons), [Themify Icons](https://github.com/lykmapipo/themify-icons), [css.gg](https://github.com/astrit/css.gg)|
+|MIT|[Ant Design Icons](https://github.com/ant-design/ant-design-icons), [Bootstrap Icons](https://github.com/twbs/icons), [BoxIcons](https://github.com/atisawd/boxicons), [css.gg](https://github.com/astrit/css.gg), [Devicons](https://vorillaz.github.io/devicons/), [Feather](https://feathericons.com/), [Flat Color Icons](https://github.com/icons8/flat-color-icons), [Github Octicons icons](https://octicons.github.com/), [Heroicons](https://github.com/tailwindlabs/heroicons), [Heroicons 2](https://github.com/tailwindlabs/heroicons), [Icons8 Line Awesome](https://icons8.com/line-awesome), [Ionicons 4](https://ionicons.com/), [Ionicons 5](https://ionicons.com/), [Phosphor](https://github.com/phosphor-icons/core), [Radix Icons](https://icons.radix-ui.com/), [Simple Line Icons](https://thesabbir.github.io/simple-line-icons/), [Tabler Icons](https://github.com/tabler/tabler-icons), [Themify Icons](https://github.com/lykmapipo/themify-icons)|
 |CC0 1.0 Universal|[Simple Icons](https://simpleicons.org/)|
 |CC BY 3.0|[Game Icons](https://game-icons.net/)|
-|CC BY 4.0|[BoxIcons](https://github.com/atisawd/boxicons), [Font Awesome 5](https://fontawesome.com/), [Font Awesome 6](https://fontawesome.com/), [IcoMoon Free](https://github.com/Keyamoon/IcoMoon-Free), [Typicons](http://s-ings.com/typicons/), [VS Code Icons](https://github.com/microsoft/vscode-codicons)|
+|CC BY 4.0|[Font Awesome 5](https://fontawesome.com/), [Font Awesome 6](https://fontawesome.com/), [IcoMoon Free](https://github.com/Keyamoon/IcoMoon-Free), [Typicons](http://s-ings.com/typicons/), [VS Code Icons](https://github.com/microsoft/vscode-codicons)|
 |MPL-2.0|[Circum Icons](https://circumicons.com/)|
-|Apache 2.0|[Material Design icons](http://google.github.io/material-design-icons/), [Remix Icon](https://github.com/Remix-Design/RemixIcon)|
+|Apache 2.0|[Grommet Icons](https://github.com/grommet/grommet-icons), [Material Design icons](http://google.github.io/material-design-icons/), [Remix Icon](https://github.com/Remix-Design/RemixIcon)|
 |ISC|[Lucide](https://lucide.dev/)|
 |SIL OFL 1.1|[Weather Icons](https://erikflowers.github.io/weather-icons/)|
 
