@@ -118,7 +118,7 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           }
           #icon-wrapper {
             flex-grow: 1;
-            display: flex;
+            display: grid;
             align-items: center;
             gap: 0.25rem;
             color: var(--vscode-foreground);
