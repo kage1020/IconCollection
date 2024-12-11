@@ -43,7 +43,7 @@ then, you can get svg icons and mxlibrary file with running `parsers/*.js`.
 |ISC|[Lucide](https://lucide.dev/)|
 |SIL OFL 1.1|[Weather Icons](https://erikflowers.github.io/weather-icons/)|
 
-### [Iconify Design@2.2.74](https://iconify.design/)
+### [Iconify Design@2.2.275](https://iconify.design/)
 
 | License | Icons |
 | --- | --- |

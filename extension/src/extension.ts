@@ -83,8 +83,10 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
 						box-sizing: border-box;
 					}
 					body {
-						display: grid;
+						display: flex;
+            flex-direction: column;
 						gap: 1rem;
+            height: 100vh;
 					}
 					#input {
 						background-color: var(--vscode-input-background);
@@ -97,6 +99,8 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           #icon-container {
             display: grid;
             gap: 0.5rem;
+            flex-grow: 1;
+            place-items: center;
           }
           #icon-item {
             display: flex;
@@ -105,11 +109,11 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           #icon-item button {
             background-color: transparent;
             color: rgba(255, 255, 255, 0.4);
-            border: solid 2px;
+            border: solid 1px;
             padding: 0.5rem;
             cursor: pointer;
-            border-radius: 0.25rem;
-            transition: 0.5s;
+            border-radius: 0.125rem;
+            transition: 0.3s;
             word-break: keep-all;
           }
           #icon-item button:hover {
@@ -134,6 +138,16 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
             word-break: break-all;
             grid-column: span 3;
           }
+          #not-found-container {
+            display: grid;
+          }
+          #not-found-container svg {
+            margin: 0 auto;
+            color: gray;
+          }
+          #not-found-container span {
+            text-align: center;
+          }
 				</style>
 			</head>
 			<body>
@@ -150,7 +164,7 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
                 </div>
               </div>
               <button>SVG</button>
-              <button>diagram</button>
+              <button>Diagram</button>
             </div>
           `
           )}
@@ -213,6 +227,9 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
                   iconItem.appendChild(diagramButton);
                   iconContainer.appendChild(iconItem);
 								});
+                if (message.value.length === 0) {
+                  iconContainer.innerHTML = '<div id="not-found-container"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 512 512"><path fill="currentColor" fill-rule="evenodd" d="M213.334 42.667C307.438 42.667 384 119.23 384 213.334c0 39.373-13.534 75.573-36.018 104.481l121.315 121.316l-30.166 30.166l-121.316-121.315C288.907 370.466 252.707 384 213.334 384c-94.104 0-170.667-76.562-170.667-170.666S119.23 42.667 213.334 42.667m0 42.667c-70.584 0-128 57.416-128 128c0 70.583 57.416 128 128 128c70.583 0 128-57.417 128-128c0-70.584-57.417-128-128-128m0 160c17.673 0 32 14.327 32 32s-14.327 32-32 32s-32-14.327-32-32s14.327-32 32-32m21.333-138.667v106.667H192V106.667z"/></svg><span>探しているアイコンは旅行中です。</span><span><a href="https://github.com/kage1020/IconCollection/issues">ここ</a>に手紙を送ると返ってくるかもしれません。</span></div>';
+                }
 								break;
 						}
 					});

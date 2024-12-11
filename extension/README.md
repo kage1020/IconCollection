@@ -20,6 +20,10 @@ This is a collection of library icons for use in VSCode. This extension provides
 
 Fix diagram's width and height.
 
+### 0.1.1
+
+Fix icon list's style and update icons.
+
 ## Acknowledgements
 
 This extension is inspired by [Iconbuddy](https://marketplace.visualstudio.com/items?itemName=mddanishyusuf.iconbuddy-vs-code-plugin). Thanks to their work.
