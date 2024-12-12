@@ -39,3 +39,7 @@ Fix diagram's width and height.
 ## 0.1.1
 
 Fix icon list's style and update icons.
+
+## 0.1.2
+
+Fix icon list's style.

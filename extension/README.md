@@ -20,9 +20,9 @@ This is a collection of library icons for use in VSCode. This extension provides
 
 Fix diagram's width and height.
 
-### 0.1.1
+### 0.1.2
 
-Fix icon list's style and update icons.
+Fix icon list's style.
 
 ## Acknowledgements
 

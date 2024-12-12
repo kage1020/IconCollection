@@ -71,36 +71,36 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
     const hits = (this._context.globalState.get('hits') || []) as IconType[];
 
     return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>Icon Collection</title>
-				<style>
-					* {
-						margin: 0;
-						padding: 0;
-						box-sizing: border-box;
-					}
-					body {
-						display: flex;
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Icon Collection</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            display: flex;
             flex-direction: column;
-						gap: 1rem;
+            gap: 1rem;
             height: 100vh;
-					}
-					#input {
-						background-color: var(--vscode-input-background);
-						color: var(--vscode-input-foreground);
-						height: 24px;
-						border: none;
-						padding: 3px 0 3px 6px;
-						outline-color: var(--vscode-focusBorder);
-					}
+          }
+          #input {
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            height: 24px;
+            border: none;
+            padding: 3px 0 3px 6px;
+            outline-color: var(--vscode-focusBorder);
+          }
           #icon-container {
-            display: grid;
+            display: flex;
             gap: 0.5rem;
             flex-grow: 1;
-            place-items: center;
+            flex-direction: column;
           }
           #icon-item {
             display: flex;
@@ -139,7 +139,10 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
             grid-column: span 3;
           }
           #not-found-container {
-            display: grid;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
           }
           #not-found-container svg {
             margin: 0 auto;
@@ -148,11 +151,11 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           #not-found-container span {
             text-align: center;
           }
-				</style>
-			</head>
-			<body>
-				<input type="text" id="input" value="${query}" placeholder="検索" />
-				<div id="icon-container">
+        </style>
+      </head>
+      <body>
+        <input type="text" id="input" value="${query}" placeholder="検索" />
+        <div id="icon-container">
           ${hits.map(
             (hit) => `
             <div id="icon-item">
@@ -169,26 +172,26 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
           `
           )}
         </div>
-				<script>
-					const vscode = acquireVsCodeApi();
+        <script>
+          const vscode = acquireVsCodeApi();
           let id;
 
-					const copySvg = (name) => {
-						vscode.postMessage({
-							type: 'copySvg',
-							value: name
-						});
-					}
+          const copySvg = (name) => {
+            vscode.postMessage({
+              type: 'copySvg',
+              value: name
+            });
+          }
           const copyDiagram = (name) => {
-						vscode.postMessage({
-							type: 'copyDiagram',
-							value: name
-						});
-					}
+            vscode.postMessage({
+              type: 'copyDiagram',
+              value: name
+            });
+          }
 
-					const input = document.getElementById('input');
-					const iconContainer = document.getElementById('icon-container');
-					input.addEventListener('input', (e) => {
+          const input = document.getElementById('input');
+          const iconContainer = document.getElementById('icon-container');
+          input.addEventListener('input', (e) => {
             clearTimeout(id);
             id = setTimeout(() => {
               const query = e.target.value;
@@ -197,14 +200,14 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
                 value: query
               });
             }, 250);
-					});
+          });
 
-					window.addEventListener('message', event => {
-						const message = event.data;
-						switch (message.type) {
-							case 'search':
-								iconContainer.innerHTML = '';
-								message.value.forEach((icon) => {
+          window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.type) {
+              case 'search':
+                iconContainer.innerHTML = '';
+                message.value.forEach((icon) => {
                   const iconItem = document.createElement('div');
                   iconItem.id = 'icon-item';
                   const iconWrapper = document.createElement('div');
@@ -226,16 +229,16 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
                   diagramButton.addEventListener('click', () => copyDiagram(icon));
                   iconItem.appendChild(diagramButton);
                   iconContainer.appendChild(iconItem);
-								});
+                });
                 if (message.value.length === 0) {
                   iconContainer.innerHTML = '<div id="not-found-container"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 512 512"><path fill="currentColor" fill-rule="evenodd" d="M213.334 42.667C307.438 42.667 384 119.23 384 213.334c0 39.373-13.534 75.573-36.018 104.481l121.315 121.316l-30.166 30.166l-121.316-121.315C288.907 370.466 252.707 384 213.334 384c-94.104 0-170.667-76.562-170.667-170.666S119.23 42.667 213.334 42.667m0 42.667c-70.584 0-128 57.416-128 128c0 70.583 57.416 128 128 128c70.583 0 128-57.417 128-128c0-70.584-57.417-128-128-128m0 160c17.673 0 32 14.327 32 32s-14.327 32-32 32s-32-14.327-32-32s14.327-32 32-32m21.333-138.667v106.667H192V106.667z"/></svg><span>探しているアイコンは旅行中です。</span><span><a href="https://github.com/kage1020/IconCollection/issues">ここ</a>に手紙を送ると返ってくるかもしれません。</span></div>';
                 }
-								break;
-						}
-					});
-				</script>
-			</body>
-			</html>`;
+                break;
+            }
+          });
+        </script>
+      </body>
+      </html>`;
   }
 
   private async search(webview: vscode.Webview) {
