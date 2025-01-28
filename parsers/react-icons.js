@@ -49,7 +49,8 @@ function modifySvg(childrenEl) {
     path.classList.add(`p${counter}-fill`);
     pathFillStyle.innerHTML += `.p${counter}-fill{fill:${
       path.getAttribute('fill') || 'currentColor'
-    }}`;
+      }}`;
+    counter++;
   }
   if (paths.length > 0) parent.appendChild(pathFillStyle);
   counter = 0;
@@ -58,7 +59,8 @@ function modifySvg(childrenEl) {
     path.classList.add(`p${counter}-stroke`);
     pathStrokeStyle.innerHTML += `.p${counter}-stroke{stroke:${
       path.getAttribute('stroke') || 'currentColor'
-    }}`;
+      }}`;
+    counter++;
   }
   if (paths.length > 0) parent.appendChild(pathStrokeStyle);
 
@@ -67,6 +69,7 @@ function modifySvg(childrenEl) {
   for (const g of gs) {
     g.classList.add(`g${counter}-fill`);
     gFillStyle.innerHTML += `.g${counter}-fill{fill:${g.getAttribute('fill') || 'currentColor'}}`;
+    counter++;
   }
   if (gs.length > 0) parent.appendChild(gFillStyle);
   counter = 0;
@@ -75,7 +78,8 @@ function modifySvg(childrenEl) {
     g.classList.add(`g${counter}-stroke`);
     gStrokeStyle.innerHTML += `.g${counter}-stroke{stroke:${
       g.getAttribute('stroke') || 'currentColor'
-    }}`;
+      }}`;
+    counter++;
   }
   if (gs.length > 0) parent.appendChild(gStrokeStyle);
 
@@ -85,7 +89,8 @@ function modifySvg(childrenEl) {
     rect.classList.add(`r${counter}-fill`);
     rectFillStyle.innerHTML += `.r${counter}-fill{fill:${
       rect.getAttribute('fill') || 'currentColor'
-    }}`;
+      }}`;
+    counter++;
   }
   if (rects.length > 0) parent.appendChild(rectFillStyle);
   counter = 0;
@@ -94,7 +99,8 @@ function modifySvg(childrenEl) {
     rect.classList.add(`r${counter}-stroke`);
     rectStrokeStyle.innerHTML += `.r${counter}-stroke{stroke:${
       rect.getAttribute('stroke') || 'currentColor'
-    }}`;
+      }}`;
+    counter++;
   }
   if (rects.length > 0) parent.appendChild(rectStrokeStyle);
 
@@ -113,6 +119,11 @@ const constructSVG = (svgEl, data) => {
   if (child || children) {
     for (const c of child || children) {
       svgEl = constructSVG(svgEl, c);
+    }
+
+    for (const [key, value] of Object.entries(props)) {
+      if (!value) continue;
+      svgEl.setAttribute(key, value);
     }
   } else {
     const { type, props } = data;
