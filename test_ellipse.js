@@ -1,9 +1,7 @@
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
-const { locate } = require('@iconify/json');
 
-const json = JSON.parse(fs.readFileSync('node_modules/@iconify/json/collections.json', 'utf8'));
-
+// Test the updated modifySvg function with ellipse support
 const { document } = new JSDOM('<!DOCTYPE html><html><body></body></html>').window;
 
 function createElementNS(elementType) {
@@ -103,48 +101,39 @@ function modifySvg(svgEl) {
   return parent.outerHTML;
 }
 
-const progress = require('cli-progress');
-const bar = new progress.MultiBar(
-  {
-    clearOnComplete: true,
-    hideCursor: true,
-    barsize: 50,
-    format: ' {bar} | {percentage}% | {value}/{total} | {name}',
-  },
-  progress.Presets.shades_grey
-);
+// Test ellipse with fill
+console.log('Testing ellipse with fill="currentColor":');
+const ellipseFillTest = '<ellipse cx="50" cy="25" rx="40" ry="20" fill="currentColor"/>';
+const ellipseFillResult = modifySvg(ellipseFillTest);
+console.log('Result:', ellipseFillResult);
 
-const libBar = bar.create(Object.keys(json).length, 0, { name: 'Libraries' });
-libBar.start(Object.keys(json).length, 0, { name: 'Libraries' });
-for (const [lib, value] of Object.entries(json)) {
-  libBar.increment();
-  bar.update();
-
-  const title = value.name;
-  if (fs.existsSync(`./out/svg/${title.replace(/\s/g, '')}`)) continue;
-
-  fs.mkdirSync(`./out/svg/${title.replace(/\s/g, '')}`, { recursive: true });
-
-  const icons = JSON.parse(fs.readFileSync(locate(lib), 'utf8'));
-
-  const iconBar = bar.create(Object.keys(icons.icons).length, 0, {
-    name: title.replace(/\s/g, ''),
-  });
-  iconBar.start(Object.keys(icons.icons).length, 0, { name: title.replace(/\s/g, '') });
-  for (const [key, body] of Object.entries(icons.icons)) {
-    iconBar.increment();
-    bar.update();
-
-    const svgEl = createElementNS('svg');
-    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svgEl.setAttribute(
-      'viewBox',
-      `0 0 ${body.width ?? icons.width ?? 16} ${body.height ?? icons.height ?? 16}`
-    );
-    svgEl.innerHTML = modifySvg(body.body);
-
-    fs.writeFileSync(`./out/svg/${title.replace(/\s/g, '')}/${key}.svg`, svgEl.outerHTML);
-  }
-  bar.remove(iconBar);
+if (ellipseFillResult.includes('class="e0-fill"')) {
+  console.log('✓ Ellipse fill element has e0-fill class applied');
 }
-bar.stop();
+if (ellipseFillResult.includes('.e0-fill{fill:currentColor}')) {
+  console.log('✓ CSS style for e0-fill is present');
+}
+
+// Test ellipse with stroke
+console.log('\nTesting ellipse with stroke="currentColor":');
+const ellipseStrokeTest = '<ellipse cx="50" cy="25" rx="40" ry="20" stroke="currentColor" fill="none"/>';
+const ellipseStrokeResult = modifySvg(ellipseStrokeTest);
+console.log('Result:', ellipseStrokeResult);
+
+if (ellipseStrokeResult.includes('class="e0-stroke"')) {
+  console.log('✓ Ellipse stroke element has e0-stroke class applied');
+}
+if (ellipseStrokeResult.includes('.e0-stroke{stroke:currentColor}')) {
+  console.log('✓ CSS style for e0-stroke is present');
+}
+
+// Test mixed elements
+console.log('\nTesting mixed elements:');
+const mixedTest = '<circle cx="10" cy="10" r="5" fill="currentColor"/><ellipse cx="30" cy="10" rx="8" ry="5" fill="currentColor"/><path d="M50,10 L60,20" stroke="currentColor"/>';
+const mixedResult = modifySvg(mixedTest);
+console.log('Result:', mixedResult);
+
+console.log('\nChecking all elements are handled:');
+if (mixedResult.includes('c0-fill')) console.log('✓ Circle handled');
+if (mixedResult.includes('e0-fill')) console.log('✓ Ellipse handled');
+if (mixedResult.includes('p0-stroke')) console.log('✓ Path handled');

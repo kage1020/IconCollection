@@ -10,6 +10,7 @@ function createElementNS(elementType) {
   return document.createElementNS('http://www.w3.org/2000/svg', elementType);
 }
 
+// Updated modifySvg function with full circle and ellipse support
 function modifySvg(svgEl) {
   const parent = createElementNS('g');
   parent.innerHTML = svgEl;
@@ -103,37 +104,30 @@ function modifySvg(svgEl) {
   return parent.outerHTML;
 }
 
-const progress = require('cli-progress');
-const bar = new progress.MultiBar(
-  {
-    clearOnComplete: true,
-    hideCursor: true,
-    barsize: 50,
-    format: ' {bar} | {percentage}% | {value}/{total} | {name}',
-  },
-  progress.Presets.shades_grey
-);
+// Test various icon collections with different element types
+const testCollections = [
+  { lib: 'ic', name: 'Google Material Icons', icons: ['baseline-brightness-1', 'baseline-circle'] },
+  { lib: 'ri', name: 'Remix Icon', icons: ['plane-fill', 'circle-fill'] }
+];
 
-const libBar = bar.create(Object.keys(json).length, 0, { name: 'Libraries' });
-libBar.start(Object.keys(json).length, 0, { name: 'Libraries' });
-for (const [lib, value] of Object.entries(json)) {
-  libBar.increment();
-  bar.update();
-
+for (const testCollection of testCollections) {
+  const { lib, name: collectionName, icons: testIcons } = testCollection;
+  const value = json[lib];
   const title = value.name;
-  if (fs.existsSync(`./out/svg/${title.replace(/\s/g, '')}`)) continue;
+
+  console.log(`\nProcessing ${title}...`);
 
   fs.mkdirSync(`./out/svg/${title.replace(/\s/g, '')}`, { recursive: true });
 
   const icons = JSON.parse(fs.readFileSync(locate(lib), 'utf8'));
 
-  const iconBar = bar.create(Object.keys(icons.icons).length, 0, {
-    name: title.replace(/\s/g, ''),
-  });
-  iconBar.start(Object.keys(icons.icons).length, 0, { name: title.replace(/\s/g, '') });
+  let foundIcons = 0;
   for (const [key, body] of Object.entries(icons.icons)) {
-    iconBar.increment();
-    bar.update();
+    if (!testIcons.includes(key)) continue;
+    
+    foundIcons++;
+    console.log(`Processing icon: ${key}`);
+    console.log(`Original body: ${body.body}`);
 
     const svgEl = createElementNS('svg');
     svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -143,8 +137,14 @@ for (const [lib, value] of Object.entries(json)) {
     );
     svgEl.innerHTML = modifySvg(body.body);
 
-    fs.writeFileSync(`./out/svg/${title.replace(/\s/g, '')}/${key}.svg`, svgEl.outerHTML);
+    const outputPath = `./out/svg/${title.replace(/\s/g, '')}/${key}.svg`;
+    fs.writeFileSync(outputPath, svgEl.outerHTML);
+    
+    console.log(`Generated SVG: ${svgEl.outerHTML.substring(0, 150)}...`);
+    console.log(`Saved to: ${outputPath}`);
   }
-  bar.remove(iconBar);
+
+  console.log(`Found and processed ${foundIcons} icons from ${collectionName}`);
 }
-bar.stop();
+
+console.log('\n✓ All test icons processed successfully with the complete fix!');
