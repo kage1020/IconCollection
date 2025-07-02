@@ -19,6 +19,10 @@ function modifySvg(svgEl) {
   const gStrokes = parent.querySelectorAll('g[stroke="currentColor"]');
   const rectFills = parent.querySelectorAll('rect[fill="currentColor"]');
   const rectStrokes = parent.querySelectorAll('rect[stroke="currentColor"]');
+  const circleFills = parent.querySelectorAll('circle[fill="currentColor"]');
+  const circleStrokes = parent.querySelectorAll('circle[stroke="currentColor"]');
+  const ellipseFills = parent.querySelectorAll('ellipse[fill="currentColor"]');
+  const ellipseStrokes = parent.querySelectorAll('ellipse[stroke="currentColor"]');
 
   let counter = 0;
   const pathFillStyle = document.createElement('style');
@@ -65,6 +69,36 @@ function modifySvg(svgEl) {
     counter++;
   }
   if (rectStrokes.length > 0) parent.appendChild(rectStrokeStyle);
+  counter = 0;
+  const circleFillStyle = document.createElement('style');
+  for (const circle of circleFills) {
+    circle.classList.add(`c${counter}-fill`);
+    circleFillStyle.innerHTML += `.c${counter}-fill{fill:currentColor}`;
+    counter++;
+  }
+  if (circleFills.length > 0) parent.appendChild(circleFillStyle);
+  const circleStrokeStyle = document.createElement('style');
+  for (const circle of circleStrokes) {
+    circle.classList.add(`c${counter}-stroke`);
+    circleStrokeStyle.innerHTML += `.c${counter}-stroke{stroke:currentColor}`;
+    counter++;
+  }
+  if (circleStrokes.length > 0) parent.appendChild(circleStrokeStyle);
+  counter = 0;
+  const ellipseFillStyle = document.createElement('style');
+  for (const ellipse of ellipseFills) {
+    ellipse.classList.add(`e${counter}-fill`);
+    ellipseFillStyle.innerHTML += `.e${counter}-fill{fill:currentColor}`;
+    counter++;
+  }
+  if (ellipseFills.length > 0) parent.appendChild(ellipseFillStyle);
+  const ellipseStrokeStyle = document.createElement('style');
+  for (const ellipse of ellipseStrokes) {
+    ellipse.classList.add(`e${counter}-stroke`);
+    ellipseStrokeStyle.innerHTML += `.e${counter}-stroke{stroke:currentColor}`;
+    counter++;
+  }
+  if (ellipseStrokes.length > 0) parent.appendChild(ellipseStrokeStyle);
 
   return parent.outerHTML;
 }
