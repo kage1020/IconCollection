@@ -86,48 +86,41 @@ function modifySvg(svgEl) {
   return parent.outerHTML;
 }
 
-const progress = require('cli-progress');
-const bar = new progress.MultiBar(
-  {
-    clearOnComplete: true,
-    hideCursor: true,
-    barsize: 50,
-    format: ' {bar} | {percentage}% | {value}/{total} | {name}',
-  },
-  progress.Presets.shades_grey
-);
+// Test with the Google Material Icons (ic) collection that has circle elements
+const lib = 'ic';
+const value = json[lib];
+const title = value.name;
 
-const libBar = bar.create(Object.keys(json).length, 0, { name: 'Libraries' });
-libBar.start(Object.keys(json).length, 0, { name: 'Libraries' });
-for (const [lib, value] of Object.entries(json)) {
-  libBar.increment();
-  bar.update();
+console.log(`Processing ${title}...`);
 
-  const title = value.name;
-  if (fs.existsSync(`./out/svg/${title.replace(/\s/g, '')}`)) continue;
+fs.mkdirSync(`./out/svg/${title.replace(/\s/g, '')}`, { recursive: true });
 
-  fs.mkdirSync(`./out/svg/${title.replace(/\s/g, '')}`, { recursive: true });
+const icons = JSON.parse(fs.readFileSync(locate(lib), 'utf8'));
 
-  const icons = JSON.parse(fs.readFileSync(locate(lib), 'utf8'));
+// Process just a few test icons
+const testIcons = ['baseline-brightness-1', 'baseline-circle', 'baseline-radio-button-checked'];
+let foundIcons = 0;
 
-  const iconBar = bar.create(Object.keys(icons.icons).length, 0, {
-    name: title.replace(/\s/g, ''),
-  });
-  iconBar.start(Object.keys(icons.icons).length, 0, { name: title.replace(/\s/g, '') });
-  for (const [key, body] of Object.entries(icons.icons)) {
-    iconBar.increment();
-    bar.update();
+for (const [key, body] of Object.entries(icons.icons)) {
+  if (!testIcons.includes(key)) continue;
+  
+  foundIcons++;
+  console.log(`Processing icon: ${key}`);
+  console.log(`Original body: ${body.body}`);
 
-    const svgEl = createElementNS('svg');
-    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svgEl.setAttribute(
-      'viewBox',
-      `0 0 ${body.width ?? icons.width ?? 16} ${body.height ?? icons.height ?? 16}`
-    );
-    svgEl.innerHTML = modifySvg(body.body);
+  const svgEl = createElementNS('svg');
+  svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svgEl.setAttribute(
+    'viewBox',
+    `0 0 ${body.width ?? icons.width ?? 16} ${body.height ?? icons.height ?? 16}`
+  );
+  svgEl.innerHTML = modifySvg(body.body);
 
-    fs.writeFileSync(`./out/svg/${title.replace(/\s/g, '')}/${key}.svg`, svgEl.outerHTML);
-  }
-  bar.remove(iconBar);
+  const outputPath = `./out/svg/${title.replace(/\s/g, '')}/${key}.svg`;
+  fs.writeFileSync(outputPath, svgEl.outerHTML);
+  
+  console.log(`Generated SVG: ${svgEl.outerHTML}`);
+  console.log(`Saved to: ${outputPath}\n`);
 }
-bar.stop();
+
+console.log(`Found and processed ${foundIcons} test icons`);
