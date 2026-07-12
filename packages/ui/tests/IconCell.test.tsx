@@ -1,3 +1,13 @@
+// @vitest-environment jsdom
+//
+// This file exercises the real DOMPurify.sanitize() path (see IconCell.tsx).
+// DOMPurify's realm-safe cached-getter checks (Node.prototype getter invoked
+// via `.call()`) return empty strings for every node under happy-dom's
+// Proxy-based element implementation, which makes `sanitize()` strip all
+// elements including the wrapping `<svg>`. jsdom's Node.prototype getters
+// behave correctly when invoked via `.call()`, so this file opts into jsdom
+// for a correct sanitize() result while the rest of the suite stays on the
+// project-wide happy-dom environment.
 import type { IconHit } from '@icon-collection/core';
 import { render, screen, waitFor } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
@@ -16,6 +26,10 @@ const hit: IconHit = {
 // Distinct cache key from `hit` so the module-singleton svgCache (populated by
 // the preceding success test) does not short-circuit this failure case.
 const failHit: IconHit = { ...hit, name: 'home-error' };
+
+// Distinct cache key so the module-singleton svgCache from other tests
+// does not short-circuit this sanitization test.
+const maliciousHit: IconHit = { ...hit, name: 'home-xss' };
 
 const makeHost = (_fetchFn: typeof fetch): Host => ({
   apiBaseUrl: 'https://x.example',
@@ -73,5 +87,24 @@ describe('IconCell', () => {
     await waitFor(() => screen.getByRole('button', { name: /mdi\/home/i }));
     await user.click(screen.getByRole('button', { name: /mdi\/home/i }));
     expect(onSelect).toHaveBeenCalledWith(hit);
+  });
+
+  test('sanitizes malicious SVG markup before rendering', async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response('<svg><script>alert(1)</script><path d="M0 0"/></svg>', {
+          status: 200,
+          headers: { 'content-type': 'image/svg+xml' },
+        }),
+    );
+    vi.stubGlobal('fetch', fetchFn);
+    const { container } = render(
+      <HostProvider host={makeHost(fetch)}>
+        <IconCell hit={maliciousHit} />
+      </HostProvider>,
+    );
+    await waitFor(() => expect(container.querySelector('path')).toBeInTheDocument());
+    expect(screen.queryByText(/alert/i)).toBeNull();
+    expect(container.querySelector('script')).toBeNull();
   });
 });

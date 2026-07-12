@@ -1,7 +1,11 @@
 import type { IconHit } from '@icon-collection/core';
 import { createApiClient } from '@icon-collection/core';
+import DOMPurify from 'dompurify';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useHost } from './host.tsx';
+
+const sanitizeSvg = (body: string): string =>
+  DOMPurify.sanitize(body, { USE_PROFILES: { svg: true, svgFilters: true } });
 
 export type IconCellProps = {
   hit: IconHit;
@@ -35,8 +39,9 @@ export const IconCell = ({ hit, onSelect }: IconCellProps) => {
           client
             .getSvg(hit.collection, hit.name)
             .then((body) => {
-              svgCache.set(cacheKey(hit), body);
-              setSvg(body);
+              const sanitized = sanitizeSvg(body);
+              svgCache.set(cacheKey(hit), sanitized);
+              setSvg(sanitized);
               setStatus('ready');
             })
             .catch(() => setStatus('error'));

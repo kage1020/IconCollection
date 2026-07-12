@@ -32,9 +32,6 @@
       },
       "suspicious": {
         "noExplicitAny": "error"
-      },
-      "security": {
-        "noDangerouslySetInnerHtml": "off"
       }
     }
   },
@@ -52,6 +49,16 @@
         "rules": {
           "suspicious": {
             "noUnknownAtRules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/ui/src/IconCell.tsx"],
+      "linter": {
+        "rules": {
+          "security": {
+            "noDangerouslySetInnerHtml": "off"
           }
         }
       }

@@ -53,12 +53,18 @@ export const createApiClient = (config: ApiClientConfig): ApiClient => {
       return (await res.json()) as SearchResponse;
     },
     getSvg: async (collection, name) => {
-      const url = buildUrl(config.baseUrl, `icon/${collection}/${name}.svg`);
+      const url = buildUrl(
+        config.baseUrl,
+        `icon/${encodeURIComponent(collection)}/${encodeURIComponent(name)}.svg`,
+      );
       const res = await request(url);
       return res.text();
     },
     getMx: async (collection, name) => {
-      const url = buildUrl(config.baseUrl, `icon/${collection}/${name}.mx`);
+      const url = buildUrl(
+        config.baseUrl,
+        `icon/${encodeURIComponent(collection)}/${encodeURIComponent(name)}.mx`,
+      );
       const res = await request(url);
       return res.text();
     },

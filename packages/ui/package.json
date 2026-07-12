@@ -20,6 +20,7 @@
   "dependencies": {
     "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
+    "dompurify": "^3.4.12",
     "preact": "^10.29.7",
     "virtua": "^0.49.3"
   },
@@ -27,6 +28,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/preact": "^3.2.4",
     "@testing-library/user-event": "^14.6.1",
-    "happy-dom": "^20.10.6"
+    "@types/dompurify": "^3.2.0",
+    "happy-dom": "^20.10.6",
+    "jsdom": "^29.1.1"
   }
 }
