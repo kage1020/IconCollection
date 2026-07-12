@@ -1,5 +1,12 @@
+export type { CopyMenuProps } from './CopyMenu.tsx';
+export { CopyMenu } from './CopyMenu.tsx';
+export type { EmptyStateProps } from './EmptyState.tsx';
+export { EmptyState } from './EmptyState.tsx';
 export type { FilterBarProps, FilterOption, FilterValue } from './FilterBar.tsx';
 export { FilterBar } from './FilterBar.tsx';
+export { svgToJsx, svgToMxLibrary } from './format.ts';
+export type { CopyKind } from './hooks/useCopy.ts';
+export { useCopy } from './hooks/useCopy.ts';
 export type { SearchState, SearchStatus } from './hooks/useSearch.ts';
 export { useSearch } from './hooks/useSearch.ts';
 export type { Host, HostProviderProps } from './host.tsx';
