@@ -6,5 +6,7 @@ export type { Host, HostProviderProps } from './host.tsx';
 export { HostProvider, useHost } from './host.tsx';
 export type { IconCellProps } from './IconCell.tsx';
 export { IconCell } from './IconCell.tsx';
+export type { IconGridProps } from './IconGrid.tsx';
+export { IconGrid } from './IconGrid.tsx';
 export type { SearchBoxProps } from './SearchBox.tsx';
 export { SearchBox } from './SearchBox.tsx';

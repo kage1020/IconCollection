@@ -1,0 +1,46 @@
+import type { IconHit } from '@icon-collection/core';
+import { render, screen } from '@testing-library/preact';
+import { describe, expect, test, vi } from 'vitest';
+import type { Host } from '../src/index.ts';
+import { HostProvider, IconGrid } from '../src/index.ts';
+
+const makeHost = (): Host => ({
+  apiBaseUrl: 'https://x.example',
+  copyText: async () => {},
+  showToast: () => {},
+  persistState: { get: async () => null, set: async () => {} },
+});
+
+const hits: IconHit[] = Array.from({ length: 12 }, (_, i) => ({
+  collection: 'mdi',
+  name: `icon-${i}`,
+  license: 'Apache-2.0',
+  width: 24,
+  height: 24,
+}));
+
+describe('IconGrid', () => {
+  test('renders every hit', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('<svg/>')),
+    );
+    render(
+      <HostProvider host={makeHost()}>
+        <IconGrid hits={hits} columns={4} cellSize={72} />
+      </HostProvider>,
+    );
+    for (const hit of hits) {
+      expect(screen.getByRole('button', { name: `mdi/${hit.name}` })).toBeInTheDocument();
+    }
+  });
+
+  test('renders empty grid without crashing', () => {
+    render(
+      <HostProvider host={makeHost()}>
+        <IconGrid hits={[]} columns={4} cellSize={72} />
+      </HostProvider>,
+    );
+    expect(screen.queryAllByRole('button').length).toBe(0);
+  });
+});

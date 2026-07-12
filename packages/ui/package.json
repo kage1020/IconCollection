@@ -20,7 +20,8 @@
   "dependencies": {
     "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
-    "preact": "^10.29.7"
+    "preact": "^10.29.7",
+    "virtua": "^0.49.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
