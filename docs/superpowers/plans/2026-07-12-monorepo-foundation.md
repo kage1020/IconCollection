@@ -218,7 +218,7 @@ git commit -m "chore: bootstrap pnpm workspace and root scripts"
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": ["dist", "node_modules", ".astro", ".wrangler", "coverage", "parsers"]
+    "ignore": ["dist", "node_modules", ".astro", ".wrangler", "coverage", "parsers", "extension"]
   },
   "formatter": {
     "enabled": true,
@@ -2222,7 +2222,7 @@ export const IconCell = ({ hit, onSelect }: IconCellProps) => {
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": ["dist", "node_modules", ".astro", ".wrangler", "coverage", "parsers"]
+    "ignore": ["dist", "node_modules", ".astro", ".wrangler", "coverage", "parsers", "extension"]
   },
   "formatter": {
     "enabled": true,
