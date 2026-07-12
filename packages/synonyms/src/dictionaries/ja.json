@@ -1,0 +1,20 @@
+[
+  { "term": "カート", "expansion": "cart", "lang": "ja" },
+  { "term": "カート", "expansion": "shopping", "lang": "ja" },
+  { "term": "家", "expansion": "home", "lang": "ja" },
+  { "term": "家", "expansion": "house", "lang": "ja" },
+  { "term": "ホーム", "expansion": "home", "lang": "ja" },
+  { "term": "ユーザー", "expansion": "user", "lang": "ja" },
+  { "term": "ユーザー", "expansion": "person", "lang": "ja" },
+  { "term": "設定", "expansion": "settings", "lang": "ja" },
+  { "term": "設定", "expansion": "gear", "lang": "ja" },
+  { "term": "検索", "expansion": "search", "lang": "ja" },
+  { "term": "検索", "expansion": "magnify", "lang": "ja" },
+  { "term": "ログイン", "expansion": "login", "lang": "ja" },
+  { "term": "ログイン", "expansion": "sign-in", "lang": "ja" },
+  { "term": "鍵", "expansion": "key", "lang": "ja" },
+  { "term": "鍵", "expansion": "lock", "lang": "ja" },
+  { "term": "地図", "expansion": "map", "lang": "ja" },
+  { "term": "時計", "expansion": "clock", "lang": "ja" },
+  { "term": "時計", "expansion": "time", "lang": "ja" }
+]

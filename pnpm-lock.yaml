@@ -24,6 +24,10 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@26.1.1)(happy-dom@20.10.6)(vite@8.1.4(@types/node@26.1.1))
 
+  packages/core: {}
+
+  packages/synonyms: {}
+
 packages:
 
   '@biomejs/biome@2.5.3':
