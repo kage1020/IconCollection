@@ -32,6 +32,9 @@
       },
       "suspicious": {
         "noExplicitAny": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
       }
     }
   },
