@@ -1,4 +1,8 @@
 {
   "files": [],
-  "references": [{ "path": "packages/core" }, { "path": "packages/synonyms" }]
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/synonyms" },
+    { "path": "packages/ui" }
+  ]
 }
