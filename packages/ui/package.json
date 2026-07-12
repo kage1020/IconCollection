@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@icon-collection/core": "workspace:^",
+    "@icon-collection/synonyms": "workspace:^",
     "preact": "^10.29.7"
   },
   "devDependencies": {

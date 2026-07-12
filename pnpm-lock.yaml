@@ -37,6 +37,9 @@ importers:
       '@icon-collection/core':
         specifier: workspace:^
         version: link:../core
+      '@icon-collection/synonyms':
+        specifier: workspace:^
+        version: link:../synonyms
       preact:
         specifier: ^10.29.7
         version: 10.29.7
