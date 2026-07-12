@@ -15,5 +15,8 @@
     "typecheck": "tsc -p . --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@icon-collection/synonyms": "workspace:^"
   }
 }
