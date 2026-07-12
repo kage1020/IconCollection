@@ -190,6 +190,7 @@ git commit -m "chore: bootstrap pnpm workspace and root scripts"
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "jsxImportSource": "preact"
   }
