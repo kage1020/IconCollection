@@ -108,7 +108,7 @@ mv package.json parsers/package.json
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "tsc -b",
+    "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "test:watch": "pnpm -r --if-present test:watch"
   }
@@ -361,6 +361,7 @@ git commit -m "ci: run Biome, type-check, and Vitest on push and PR"
     }
   },
   "scripts": {
+    "typecheck": "tsc -p . --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   }
@@ -642,6 +643,7 @@ git commit -m "feat(core): normalize input and build FTS5 OR queries"
     }
   },
   "scripts": {
+    "typecheck": "tsc -p . --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   }
@@ -1263,6 +1265,7 @@ mkdir -p packages/ui/src/hooks packages/ui/tests
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
+    "typecheck": "tsc -p . --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   }
