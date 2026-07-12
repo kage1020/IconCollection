@@ -21,28 +21,25 @@
 - **UI の JSX は `jsxImportSource: "preact"`**: `preact/compat` に頼らず素の Preact API を使う
 - **テストは Vitest + happy-dom**: jsdom より速い
 - **1 タスク = 1 コミット**: 各タスク末尾でコミットする
-- **feature branch `feat/revamp-foundation` で作業**: 既存の `feat/revamp-design` から分岐
+- **feature branch `feat/revamp-design` 上で作業**: spec と本プラン（ドキュメント）は既に同ブランチにコミット済み。本プランの実装コミットも同ブランチに積む。新規ブランチは作らない
 
 ---
 
-### Task 0: ブランチ切り出しと `.node-version`
+### Task 0: `.node-version` の追加
 
 **Files:**
 - Create: `.node-version`
-- Modify: (branch 切替のみ)
 
 **Interfaces:**
 - Consumes: 既存の spec ドキュメント `docs/superpowers/specs/2026-07-12-icon-collection-revamp-design.md`
-- Produces: 以降の Task が乗る feature branch `feat/revamp-foundation`
+- Produces: `feat/revamp-design` ブランチ上の Node バージョン固定
 
-- [ ] **Step 1: `master` から分岐して feature branch を作成**
+前提: 現在の作業ブランチは既に `feat/revamp-design`。branch 切替は不要。
 
-```bash
-git fetch origin
-git checkout master
-git pull --ff-only origin master
-git checkout -b feat/revamp-foundation
-```
+- [ ] **Step 1: 現在のブランチが `feat/revamp-design` であることを確認**
+
+Run: `git rev-parse --abbrev-ref HEAD`
+Expected: `feat/revamp-design`
 
 - [ ] **Step 2: `.node-version` を作成**
 
@@ -339,7 +336,7 @@ git commit -m "ci: run Biome, type-check, and Vitest on push and PR"
 - Create: `packages/core/vitest.config.ts`
 - Create: `packages/core/src/types.ts`
 - Create: `packages/core/src/index.ts`
-- Test: `packages/core/tests/types.test-d.ts`
+- Test: `packages/core/tests/types.test.ts`
 - Modify: `tsconfig.json` (root, `references` に追加)
 
 **Interfaces:**
@@ -411,7 +408,7 @@ export default defineConfig({
 
 - [ ] **Step 5: 型定義テストを先に書く**
 
-`packages/core/tests/types.test-d.ts`:
+`packages/core/tests/types.test.ts`:
 
 ```ts
 import { expectTypeOf, test } from 'vitest';
@@ -2915,7 +2912,7 @@ git commit -m "docs: add package READMEs and plan index"
 - [ ] **Step 7: PR を作成**
 
 ```bash
-git push -u origin feat/revamp-foundation
+git push -u origin feat/revamp-design
 gh pr create --title "feat: monorepo foundation for IconCollection revamp" --body "$(cat <<'EOF'
 ## Summary
 - pnpm workspace, Biome, TypeScript strict, Vitest, CI を導入
