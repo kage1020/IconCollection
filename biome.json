@@ -13,7 +13,8 @@
       "!**/.astro",
       "!**/.wrangler",
       "!**/coverage",
-      "!**/parsers"
+      "!**/parsers",
+      "!**/extension"
     ]
   },
   "formatter": {
