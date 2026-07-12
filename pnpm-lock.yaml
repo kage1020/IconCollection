@@ -37,9 +37,6 @@ importers:
       '@icon-collection/core':
         specifier: workspace:^
         version: link:../core
-      '@icon-collection/synonyms':
-        specifier: workspace:^
-        version: link:../synonyms
       dompurify:
         specifier: ^3.4.12
         version: 3.4.12

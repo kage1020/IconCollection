@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@icon-collection/core": "workspace:^",
-    "@icon-collection/synonyms": "workspace:^",
     "dompurify": "^3.4.12",
     "preact": "^10.29.7",
     "virtua": "^0.49.3"

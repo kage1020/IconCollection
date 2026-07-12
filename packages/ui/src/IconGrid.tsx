@@ -6,7 +6,6 @@ export type IconGridProps = {
   columns?: number;
   cellSize?: number;
   onSelect?: (hit: IconHit) => void;
-  virtualize?: boolean;
 };
 
 // virtua の VGrid による仮想スクロールは Web ビルドで有効化する予定。

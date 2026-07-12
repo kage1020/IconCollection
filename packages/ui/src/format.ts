@@ -21,8 +21,13 @@ export const svgToJsx = (svg: string): string => {
 const VIEWBOX_RE = /viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/;
 
 const b64 = (input: string): string => {
-  if (typeof btoa === 'function') return btoa(input);
-  return Buffer.from(input, 'utf-8').toString('base64');
+  const bytes = new TextEncoder().encode(input);
+  if (typeof btoa === 'function') {
+    let binary = '';
+    for (const b of bytes) binary += String.fromCharCode(b);
+    return btoa(binary);
+  }
+  return Buffer.from(bytes).toString('base64');
 };
 
 export const svgToMxLibrary = (svg: string): string => {

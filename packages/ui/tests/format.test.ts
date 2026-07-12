@@ -36,4 +36,23 @@ describe('svgToMxLibrary', () => {
     expect(out).toContain('width="100"');
     expect(out).toContain('height="100"');
   });
+
+  test('base64-encodes multibyte SVG content without throwing', () => {
+    const svg = '<svg viewBox="0 0 24 24"><title>日本語タイトル</title><path d="M0 0"/></svg>';
+    let out = '';
+    expect(() => {
+      out = svgToMxLibrary(svg);
+    }).not.toThrow();
+    expect(out).toContain('image=data:image/svg+xml,');
+
+    const match = out.match(/image=data:image\/svg\+xml,([^;]+);/);
+    expect(match).not.toBeNull();
+    const encoded = match?.[1] ?? '';
+
+    const decoded =
+      typeof atob === 'function'
+        ? new TextDecoder().decode(Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0)))
+        : Buffer.from(encoded, 'base64').toString('utf-8');
+    expect(decoded).toBe(svg);
+  });
 });
