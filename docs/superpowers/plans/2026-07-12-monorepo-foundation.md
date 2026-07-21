@@ -14,7 +14,7 @@
 - **既存の `parsers/` `extension/` は残置**: このプランでは触らない。全て `packages/*` 配下に新規作成する
 - **`@ts-ignore` `@biome-ignore` などの ignore ディレクティブ禁止**: 型がうまく通らない場合は設計を直す
 - **絵文字禁止**: コード・ドキュメント・コミットメッセージのいずれにも入れない
-- **Node.js 20 系**: Cloudflare Workers 互換のため。`.node-version` に `20` を書く
+- **Node.js 22 系**: Cloudflare Workers 互換のため。`.node-version` に `22` を書く
 - **package manager は pnpm 9 系**: `corepack` で固定
 - **TypeScript は strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`**: `tsconfig.base.json` で強制
 - **UI は Preact 10 + Tailwind**: React ではなく Preact。VSCode 拡張バンドルを軽量に保つため
@@ -44,19 +44,19 @@ Expected: `feat/revamp-design`
 - [ ] **Step 2: `.node-version` を作成**
 
 ```
-20
+22
 ```
 
 - [ ] **Step 3: 内容を確認**
 
 Run: `cat .node-version`
-Expected: `20`
+Expected: `22`
 
 - [ ] **Step 4: コミット**
 
 ```bash
 git add .node-version
-git commit -m "chore: pin Node.js to 20 for Cloudflare Workers compatibility"
+git commit -m "chore: pin Node.js to 22 for Cloudflare Workers compatibility"
 ```
 
 ---
@@ -1281,6 +1281,13 @@ pnpm -F @icon-collection/ui add -D @testing-library/preact @testing-library/user
 pnpm -F @icon-collection/ui add @icon-collection/core@workspace:*
 ```
 
+`tailwindcss` は `packages/ui` 自身では実処理を行わず、Tailwind の実処理は取り込む側の app が担う契約のため、`peerDependencies` として追加する。standalone での typecheck/lint 実行時に peer dep 不足を出さないよう `devDependencies` にも同じバージョンを追加する:
+
+```bash
+pnpm -F @icon-collection/ui add tailwindcss --save-peer
+pnpm -F @icon-collection/ui add -D tailwindcss
+```
+
 - [ ] **Step 3: `packages/ui/tsconfig.json` を作成**
 
 ```json
@@ -1422,9 +1429,7 @@ export const useHost = (): Host => {
 - [ ] **Step 9: `packages/ui/src/styles.css` を作成（Tailwind エントリ、実 config は apps 側）**
 
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 ```
 
 - [ ] **Step 10: `packages/ui/src/index.ts` を作成**
