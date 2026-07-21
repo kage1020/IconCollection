@@ -101,7 +101,7 @@ mv package.json parsers/package.json
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
