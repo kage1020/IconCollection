@@ -1,0 +1,18 @@
+[
+  { "term": "cart", "expansion": "shopping", "lang": "en" },
+  { "term": "cart", "expansion": "bag", "lang": "en" },
+  { "term": "home", "expansion": "house", "lang": "en" },
+  { "term": "house", "expansion": "home", "lang": "en" },
+  { "term": "user", "expansion": "person", "lang": "en" },
+  { "term": "user", "expansion": "account", "lang": "en" },
+  { "term": "settings", "expansion": "gear", "lang": "en" },
+  { "term": "settings", "expansion": "cog", "lang": "en" },
+  { "term": "search", "expansion": "magnify", "lang": "en" },
+  { "term": "login", "expansion": "sign-in", "lang": "en" },
+  { "term": "logout", "expansion": "sign-out", "lang": "en" },
+  { "term": "key", "expansion": "lock", "lang": "en" },
+  { "term": "delete", "expansion": "trash", "lang": "en" },
+  { "term": "trash", "expansion": "delete", "lang": "en" },
+  { "term": "edit", "expansion": "pencil", "lang": "en" },
+  { "term": "clock", "expansion": "time", "lang": "en" }
+]
