@@ -245,12 +245,12 @@ git commit -m "feat(ingest): scaffold tools/ingest package with tsx runner"
 - [ ] **Step 1: `@iconify/types` を dev 依存で install**
 
 ```bash
-pnpm -F @icon-collection/ingest add @iconify/types @iconify/utils
+pnpm -F @icon-collection/ingest add @iconify/types
 pnpm -F @icon-collection/ingest add -D @iconify/json
 ```
 
 - `@iconify/json` は fixture 生成と本番 collect の両方で使う。size は大きいが node_modules に置く限り Actions runner なら OK。dev 扱いにするのは、production ビルド成果物（tsx で直接実行）に含めないため
-- `@iconify/utils` は Task 4 で `iconToSVG` を使う予定はないが、共通ロジック（`buildIcon` などのメタ抽出）で使う
+- `@iconify/utils` は Plan C の Worker 側で使う予定で、Plan B のスコープ内では使わないため install しない
 
 - [ ] **Step 2: `tools/ingest/src/types.ts` を作成**
 
