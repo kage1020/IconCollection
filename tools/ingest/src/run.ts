@@ -51,7 +51,6 @@ export const run = async (config: IngestConfig, deps: RunDeps = {}): Promise<Ing
   }
 
   await syncSnapshotsToR2({ r2, snapshots, dryRun: config.dryRun });
-  await r2.putJson('meta/version.json', nextVersions);
 
   let d1RowsInserted = 0;
   let ftsRebuilt = false;
@@ -62,6 +61,7 @@ export const run = async (config: IngestConfig, deps: RunDeps = {}): Promise<Ing
     await seedCollectionMeta({ d1, snapshots });
     await rebuildFts(d1);
     ftsRebuilt = true;
+    await r2.putJson('meta/version.json', nextVersions);
   }
 
   return {

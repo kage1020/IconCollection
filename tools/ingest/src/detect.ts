@@ -14,7 +14,7 @@ export type DetectResult = {
 
 export const detectChanges = (input: DetectInput): DetectResult => {
   const changed: string[] = [];
-  const nextVersions: Record<string, string> = {};
+  const nextVersions: Record<string, string> = { ...input.storedVersions };
   for (const collection of input.collections) {
     nextVersions[collection] = input.currentVersion;
     if (input.storedVersions[collection] !== input.currentVersion) {

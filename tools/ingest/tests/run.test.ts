@@ -88,4 +88,61 @@ describe('run', () => {
     expect(executed.some((s) => s.startsWith('INSERT INTO icons '))).toBe(false);
     expect(executed.some((s) => s.startsWith('DELETE FROM icons'))).toBe(false);
   });
+
+  test('does not update meta/version.json when D1 seed throws', async () => {
+    const r2Puts: Array<[string, unknown]> = [];
+    const r2 = {
+      putJson: vi.fn(async (key: string, value: unknown) => {
+        r2Puts.push([key, value]);
+        return { changed: true, sha256: 'x' };
+      }),
+      getJson: vi.fn(async () => null),
+    } as unknown as R2Client;
+    const d1 = {
+      execute: vi.fn(async (sql: string) => {
+        if (sql.startsWith('INSERT INTO icons ')) {
+          throw new Error('boom');
+        }
+        return okResult;
+      }),
+    } as unknown as D1Client;
+    await expect(
+      run(baseConfig, {
+        r2,
+        d1,
+        readVersion: async () => '2.2.500',
+        collect: async (c, v) => collectFromPath(fixturePath(`${c}-mini.json`), v),
+      }),
+    ).rejects.toThrow('boom');
+    expect(r2Puts.find(([k]) => k === 'meta/version.json')).toBeUndefined();
+  });
+
+  test('writes meta/version.json after all D1 seeding completes', async () => {
+    const events: string[] = [];
+    const r2 = {
+      putJson: vi.fn(async (key: string) => {
+        events.push(`put:${key}`);
+        return { changed: true, sha256: 'x' };
+      }),
+      getJson: vi.fn(async () => null),
+    } as unknown as R2Client;
+    const d1 = {
+      execute: vi.fn(async (sql: string) => {
+        if (sql.startsWith("INSERT INTO icons_fts(icons_fts) VALUES('rebuild')")) {
+          events.push('fts:rebuild');
+        }
+        return okResult;
+      }),
+    } as unknown as D1Client;
+    await run(baseConfig, {
+      r2,
+      d1,
+      readVersion: async () => '2.2.500',
+      collect: async (c, v) => collectFromPath(fixturePath(`${c}-mini.json`), v),
+    });
+    const ftsIdx = events.indexOf('fts:rebuild');
+    const metaIdx = events.indexOf('put:meta/version.json');
+    expect(ftsIdx).toBeGreaterThanOrEqual(0);
+    expect(metaIdx).toBeGreaterThan(ftsIdx);
+  });
 });

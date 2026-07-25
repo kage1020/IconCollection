@@ -39,18 +39,6 @@ describe('syncSnapshotsToR2', () => {
     expect(second.unchanged.sort()).toEqual(['lucide', 'mdi']);
   });
 
-  test('writes meta/version.json with all collection versions', async () => {
-    const putJson = vi.fn(async (_key: string, _value: unknown) => ({
-      changed: true,
-      sha256: 'x',
-    }));
-    const client = stubClient({ putJson, getJson: async () => null });
-    await syncSnapshotsToR2({ r2: client, snapshots: [makeSnap('mdi'), makeSnap('lucide')] });
-    const metaCall = putJson.mock.calls.find(([key]) => key === 'meta/version.json');
-    expect(metaCall).toBeDefined();
-    expect(metaCall?.[1]).toEqual({ mdi: '2.2.400', lucide: '2.2.400' });
-  });
-
   test('dryRun avoids putJson entirely', async () => {
     const putJson = vi.fn(async () => ({ changed: true, sha256: 'x' }));
     const client = stubClient({ putJson, getJson: async () => null });

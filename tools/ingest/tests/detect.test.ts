@@ -44,6 +44,20 @@ describe('detectChanges', () => {
     });
     expect(result.changed).toEqual(['heroicons', 'mdi', 'lucide']);
   });
+
+  test('preserves versions of collections outside the input list', () => {
+    const result = detectChanges({
+      collections: ['mdi'],
+      currentVersion: '2.2.500',
+      storedVersions: { mdi: '2.2.400', lucide: '2.2.400', heroicons: '2.2.400' },
+    });
+    expect(result.changed).toEqual(['mdi']);
+    expect(result.nextVersions).toEqual({
+      mdi: '2.2.500',
+      lucide: '2.2.400',
+      heroicons: '2.2.400',
+    });
+  });
 });
 
 describe('readIconifyVersion', () => {

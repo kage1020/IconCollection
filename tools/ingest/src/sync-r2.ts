@@ -24,8 +24,5 @@ export const syncSnapshotsToR2 = async (input: SyncInput): Promise<SyncResult> =
     if (result.changed) uploaded.push(snap.collection);
     else unchanged.push(snap.collection);
   }
-  const versions: Record<string, string> = {};
-  for (const snap of input.snapshots) versions[snap.collection] = snap.version;
-  await input.r2.putJson('meta/version.json', versions);
   return { uploaded, unchanged };
 };
