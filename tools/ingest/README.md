@@ -32,7 +32,7 @@ pnpm -F @icon-collection/ingest start
 2. `detectChanges` — `@iconify/json` のバージョンと R2 の `meta/version.json` を比較
 3. `collectFromIconify` — 差分があるコレクションだけ JSON を読む
 4. `syncSnapshotsToR2` — sha256 差分で R2 の `iconify/{collection}.json` を put
-5. `seedIcons` — collection 単位で `DELETE` + 500 行バッチ `INSERT`
+5. `seedIcons` — collection 単位で `DELETE` + 10 行バッチ `INSERT`（D1 の 100 bind-param 上限を尊重）
 6. `seedSynonyms` — `@icon-collection/synonyms` から D1 の `synonyms` テーブルへ
 7. `seedCollectionMeta` — `collection_meta` を upsert
 8. `rebuildFts` — `INSERT INTO icons_fts(icons_fts) VALUES('rebuild')`
