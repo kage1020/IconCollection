@@ -20,8 +20,9 @@ export const useCopy = (): ((kind: CopyKind, hit: IconHit) => Promise<void>) => 
         await host.copyText(mx);
       }
       host.showToast('Copied');
-    } catch {
-      host.showToast('Copy failed');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      host.showToast(`Copy failed: ${message}`);
     }
   };
 };

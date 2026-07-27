@@ -71,6 +71,6 @@ describe('CopyMenu', () => {
       </HostProvider>,
     );
     await user.click(screen.getByRole('button', { name: 'SVG' }));
-    await waitFor(() => expect(showToast).toHaveBeenCalledWith('Copy failed'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('Copy failed: boom'));
   });
 });
