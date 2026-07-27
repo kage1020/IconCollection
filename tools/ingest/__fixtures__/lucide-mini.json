@@ -1,0 +1,16 @@
+{
+  "prefix": "lucide",
+  "info": {
+    "name": "Lucide",
+    "total": 2,
+    "license": { "title": "ISC" }
+  },
+  "icons": {
+    "home": { "body": "<path d='M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-6H10v6H6a2 2 0 01-2-2z'/>" },
+    "user": {
+      "body": "<circle cx='12' cy='7' r='4'/><path d='M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2'/>"
+    }
+  },
+  "width": 24,
+  "height": 24
+}
