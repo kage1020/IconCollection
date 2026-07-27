@@ -66,11 +66,31 @@ export class D1Client {
     return first;
   }
 
-  async batch(stmts: readonly { sql: string; params?: readonly unknown[] }[]): Promise<D1Result[]> {
-    const results: D1Result[] = [];
-    for (const stmt of stmts) {
-      results.push(await this.execute(stmt.sql, stmt.params));
+  async batchAtomic(
+    statements: readonly { sql: string; params?: readonly unknown[] }[],
+  ): Promise<D1Result[]> {
+    if (statements.length === 0) return [];
+    const res = await this.fetchImpl(this.endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.cfg.apiToken}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(statements.map((s) => ({ sql: s.sql, params: s.params ?? [] }))),
+    });
+    const body = (await res.json()) as D1Response;
+    if (!res.ok || !body.success) {
+      throw new D1Error({
+        status: res.status,
+        errors: body.errors ?? [{ code: -1, message: 'unknown' }],
+      });
     }
-    return results;
+    if (!body.result || body.result.length !== statements.length) {
+      throw new D1Error({
+        status: res.status,
+        errors: [{ code: -3, message: `result count mismatch: expected ${statements.length}` }],
+      });
+    }
+    return body.result;
   }
 }

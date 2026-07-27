@@ -50,33 +50,52 @@ describe('D1Client.execute', () => {
   });
 });
 
-describe('D1Client.batch', () => {
-  test('POSTs multiple statements to the /batch endpoint', async () => {
-    // batch() issues one HTTP request per statement (serial execute) to guarantee
-    // ordering, so each call must resolve with that statement's own response.
-    const responses = [
-      jsonRes({
-        success: true,
-        result: [{ success: true, meta: { changes: 1, last_row_id: null }, results: [] }],
-      }),
-      jsonRes({
-        success: true,
-        result: [{ success: true, meta: { changes: 2, last_row_id: null }, results: [] }],
-      }),
-    ];
-    const fetchFn = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => {
-      const next = responses.shift();
-      if (!next) throw new Error('unexpected extra fetch call');
-      return next;
-    });
-    const client = new D1Client(cfg, fetchFn);
-    const results = await client.batch([
+describe('D1Client.batchAtomic', () => {
+  test('posts statements as JSON array and returns per-statement results', async () => {
+    const seen: unknown[] = [];
+    const fetchImpl = async (url: string, init?: RequestInit) => {
+      seen.push({ url, body: init?.body });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          result: [
+            { success: true, meta: { changes: 3, last_row_id: null }, results: [] },
+            { success: true, meta: { changes: 1, last_row_id: 42 }, results: [] },
+          ],
+        }),
+        { status: 200 },
+      );
+    };
+    const client = new D1Client(
+      { apiToken: 't', accountId: 'a', databaseId: 'd' },
+      fetchImpl as typeof fetch,
+    );
+    const results = await client.batchAtomic([
       { sql: 'DELETE FROM icons WHERE collection = ?', params: ['mdi'] },
-      { sql: 'INSERT INTO icons (collection, name) VALUES (?, ?)', params: ['mdi', 'home'] },
+      {
+        sql: 'INSERT INTO icons (id, collection, name, license, updated_at) VALUES (?, ?, ?, ?, ?)',
+        params: [1, 'mdi', 'home', 'Apache-2.0', 100],
+      },
     ]);
-    expect(results).toHaveLength(2);
-    expect(results[1]?.meta.changes).toBe(2);
-    const url = fetchFn.mock.calls[0]?.[0] as string;
-    expect(url).toContain('/query'); // Cloudflare uses /query with sql array for batch
+    expect(results.map((r) => r.meta.changes)).toEqual([3, 1]);
+    const body = JSON.parse((seen[0] as { body: string }).body);
+    expect(Array.isArray(body)).toBe(true);
+    expect(body).toHaveLength(2);
+    expect(body[0].sql).toBe('DELETE FROM icons WHERE collection = ?');
+    expect(body[1].params).toEqual([1, 'mdi', 'home', 'Apache-2.0', 100]);
+  });
+
+  test('throws D1Error on non-success', async () => {
+    const fetchImpl = async () =>
+      new Response(JSON.stringify({ success: false, errors: [{ code: 8000, message: 'x' }] }), {
+        status: 500,
+      });
+    const client = new D1Client(
+      { apiToken: 't', accountId: 'a', databaseId: 'd' },
+      fetchImpl as typeof fetch,
+    );
+    await expect(client.batchAtomic([{ sql: 'DELETE FROM icons' }])).rejects.toThrow(
+      'D1 request failed',
+    );
   });
 });
