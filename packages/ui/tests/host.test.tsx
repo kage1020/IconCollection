@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/preact';
 import { describe, expect, test, vi } from 'vitest';
 import type { Host } from '../src/index.ts';
-import { HostProvider, useHost } from '../src/index.ts';
+import { createSvgCache, HostProvider, useHost } from '../src/index.ts';
 
 const makeHost = (): Host => ({
   apiBaseUrl: 'https://x.example',
@@ -11,6 +11,7 @@ const makeHost = (): Host => ({
     get: vi.fn(async () => null),
     set: vi.fn(async () => {}),
   },
+  svgCache: createSvgCache(),
 });
 
 const Probe = () => {

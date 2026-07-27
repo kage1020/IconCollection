@@ -13,7 +13,7 @@ import { render, screen, waitFor } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import type { Host } from '../src/index.ts';
-import { HostProvider, IconCell } from '../src/index.ts';
+import { createSvgCache, HostProvider, IconCell } from '../src/index.ts';
 
 const hit: IconHit = {
   collection: 'mdi',
@@ -23,11 +23,11 @@ const hit: IconHit = {
   height: 24,
 };
 
-// Distinct cache key from `hit` so the module-singleton svgCache (populated by
+// Distinct cache key from `hit` so the instance svgCache (populated by
 // the preceding success test) does not short-circuit this failure case.
 const failHit: IconHit = { ...hit, name: 'home-error' };
 
-// Distinct cache key so the module-singleton svgCache from other tests
+// Distinct cache key so the instance svgCache from other tests
 // does not short-circuit this sanitization test.
 const maliciousHit: IconHit = { ...hit, name: 'home-xss' };
 
@@ -36,6 +36,7 @@ const makeHost = (_fetchFn: typeof fetch): Host => ({
   copyText: async () => {},
   showToast: () => {},
   persistState: { get: async () => null, set: async () => {} },
+  svgCache: createSvgCache(),
 });
 
 describe('IconCell', () => {

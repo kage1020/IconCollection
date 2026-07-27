@@ -2,13 +2,14 @@ import { renderHook, waitFor } from '@testing-library/preact';
 import type { ComponentChildren } from 'preact';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import type { Host } from '../src/index.ts';
-import { HostProvider, useSearch } from '../src/index.ts';
+import { createSvgCache, HostProvider, useSearch } from '../src/index.ts';
 
 const makeHost = (_fetchImpl: typeof fetch): Host => ({
   apiBaseUrl: 'https://x.example',
   copyText: async () => {},
   showToast: () => {},
   persistState: { get: async () => null, set: async () => {} },
+  svgCache: createSvgCache(),
 });
 
 const wrapWith =

@@ -14,16 +14,15 @@ export type IconCellProps = {
 
 type CellStatus = 'idle' | 'loading' | 'ready' | 'error';
 
-const svgCache = new Map<string, string>();
 const cacheKey = (h: IconHit) => `${h.collection}/${h.name}`;
 
 export const IconCell = ({ hit, onSelect }: IconCellProps) => {
   const host = useHost();
   const client = useMemo(() => createApiClient({ baseUrl: host.apiBaseUrl }), [host.apiBaseUrl]);
   const [status, setStatus] = useState<CellStatus>(() =>
-    svgCache.has(cacheKey(hit)) ? 'ready' : 'idle',
+    host.svgCache.has(cacheKey(hit)) ? 'ready' : 'idle',
   );
-  const [svg, setSvg] = useState<string | null>(() => svgCache.get(cacheKey(hit)) ?? null);
+  const [svg, setSvg] = useState<string | null>(() => host.svgCache.get(cacheKey(hit)) ?? null);
   const containerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export const IconCell = ({ hit, onSelect }: IconCellProps) => {
             .getSvg(hit.collection, hit.name)
             .then((body) => {
               const sanitized = sanitizeSvg(body);
-              svgCache.set(cacheKey(hit), sanitized);
+              host.svgCache.set(cacheKey(hit), sanitized);
               setSvg(sanitized);
               setStatus('ready');
             })

@@ -1,6 +1,9 @@
 import type { ComponentChildren } from 'preact';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
+import type { SvgCache } from './svg-cache.ts';
+
+export type { SvgCache };
 
 export type Host = {
   apiBaseUrl: string;
@@ -10,6 +13,7 @@ export type Host = {
     get: (k: string) => Promise<string | null>;
     set: (k: string, v: string) => Promise<void>;
   };
+  svgCache: SvgCache;
 };
 
 const HostContext = createContext<Host | null>(null);

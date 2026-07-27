@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import type { Host } from '../src/index.ts';
-import { CopyMenu, HostProvider } from '../src/index.ts';
+import { CopyMenu, createSvgCache, HostProvider } from '../src/index.ts';
 
 const hit: IconHit = {
   collection: 'mdi',
@@ -21,6 +21,7 @@ const setupHost = () => {
     copyText,
     showToast,
     persistState: { get: async () => null, set: async () => {} },
+    svgCache: createSvgCache(),
   };
   return { host, copyText, showToast };
 };

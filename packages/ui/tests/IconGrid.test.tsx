@@ -2,13 +2,14 @@ import type { IconHit } from '@icon-collection/core';
 import { render, screen } from '@testing-library/preact';
 import { describe, expect, test, vi } from 'vitest';
 import type { Host } from '../src/index.ts';
-import { HostProvider, IconGrid } from '../src/index.ts';
+import { createSvgCache, HostProvider, IconGrid } from '../src/index.ts';
 
 const makeHost = (): Host => ({
   apiBaseUrl: 'https://x.example',
   copyText: async () => {},
   showToast: () => {},
   persistState: { get: async () => null, set: async () => {} },
+  svgCache: createSvgCache(),
 });
 
 const hits: IconHit[] = Array.from({ length: 12 }, (_, i) => ({
