@@ -8,6 +8,8 @@ const makeSnap = (collection: string): CollectionSnapshot => ({
   version: '2.2.400',
   license: 'MIT',
   total: 3,
+  defaultWidth: 24,
+  defaultHeight: 24,
   body: {
     prefix: collection,
     icons: { home: { body: '<path/>' } },

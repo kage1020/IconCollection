@@ -7,6 +7,8 @@ export type CollectionSnapshot = {
   version: string;
   license: string;
   total: number;
+  defaultWidth: number;
+  defaultHeight: number;
   body: IconifyJSON;
 };
 

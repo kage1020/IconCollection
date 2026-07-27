@@ -8,6 +8,8 @@ const snap = (): CollectionSnapshot => ({
   version: '2.2.400',
   license: 'Apache-2.0',
   total: 3,
+  defaultWidth: 24,
+  defaultHeight: 24,
   body: {
     prefix: 'mdi',
     icons: {
@@ -49,6 +51,8 @@ describe('seedIcons', () => {
       version: '1',
       license: 'MIT',
       total: 1200,
+      defaultWidth: 24,
+      defaultHeight: 24,
       body: { prefix: 'big', icons } as CollectionSnapshot['body'],
     };
     await seedIcons({ d1: client, snapshots: [big], batchSize: 500 });
@@ -91,6 +95,8 @@ describe('seedIcons', () => {
       version: '1',
       license: 'MIT',
       total: 50,
+      defaultWidth: 24,
+      defaultHeight: 24,
       body: { prefix: 'test', icons } as CollectionSnapshot['body'],
     };
     await seedIcons({ d1: client, snapshots: [snap] });
