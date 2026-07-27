@@ -1,18 +1,7 @@
 import { render, screen } from '@testing-library/preact';
 import { describe, expect, test, vi } from 'vitest';
-import type { Host } from '../src/index.ts';
-import { createSvgCache, HostProvider, useHost } from '../src/index.ts';
-
-const makeHost = (): Host => ({
-  apiBaseUrl: 'https://x.example',
-  copyText: vi.fn(async () => {}),
-  showToast: vi.fn(),
-  persistState: {
-    get: vi.fn(async () => null),
-    set: vi.fn(async () => {}),
-  },
-  svgCache: createSvgCache(),
-});
+import { HostProvider, useHost } from '../src/index.ts';
+import { makeHost } from './_helpers.ts';
 
 const Probe = () => {
   const host = useHost();
@@ -26,7 +15,7 @@ describe('HostProvider / useHost', () => {
         <Probe />
       </HostProvider>,
     );
-    expect(screen.getByTestId('url').textContent).toBe('https://x.example');
+    expect(screen.getByTestId('url').textContent).toBe('https://example.test');
   });
 
   test('throws when useHost is called outside provider', () => {

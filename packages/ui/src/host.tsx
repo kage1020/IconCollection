@@ -1,3 +1,4 @@
+import type { ApiClient } from '@icon-collection/core';
 import type { ComponentChildren } from 'preact';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
@@ -7,6 +8,7 @@ export type { SvgCache };
 
 export type Host = {
   apiBaseUrl: string;
+  apiClient: ApiClient;
   copyText: (s: string) => Promise<void>;
   showToast: (m: string) => void;
   persistState: {

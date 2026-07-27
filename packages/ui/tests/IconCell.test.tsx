@@ -12,8 +12,8 @@ import type { IconHit } from '@icon-collection/core';
 import { render, screen, waitFor } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
-import type { Host } from '../src/index.ts';
-import { createSvgCache, HostProvider, IconCell } from '../src/index.ts';
+import { HostProvider, IconCell } from '../src/index.ts';
+import { makeHost } from './_helpers.ts';
 
 const hit: IconHit = {
   collection: 'mdi',
@@ -31,38 +31,24 @@ const failHit: IconHit = { ...hit, name: 'home-error' };
 // does not short-circuit this sanitization test.
 const maliciousHit: IconHit = { ...hit, name: 'home-xss' };
 
-const makeHost = (_fetchFn: typeof fetch): Host => ({
-  apiBaseUrl: 'https://x.example',
-  copyText: async () => {},
-  showToast: () => {},
-  persistState: { get: async () => null, set: async () => {} },
-  svgCache: createSvgCache(),
-});
-
 describe('IconCell', () => {
   test('renders SVG after intersecting and fetching', async () => {
-    const fetchFn = vi.fn(
-      async () =>
-        new Response('<svg data-testid="svg"></svg>', {
-          status: 200,
-          headers: { 'content-type': 'image/svg+xml' },
-        }),
-    );
-    vi.stubGlobal('fetch', fetchFn);
+    const getSvg = vi.fn(async () => '<svg data-testid="svg"></svg>');
     render(
-      <HostProvider host={makeHost(fetch)}>
+      <HostProvider host={makeHost({ apiClient: { getSvg } })}>
         <IconCell hit={hit} />
       </HostProvider>,
     );
     await waitFor(() => expect(screen.getByTestId('svg')).toBeInTheDocument());
-    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(getSvg).toHaveBeenCalledTimes(1);
   });
 
   test('shows a fallback when fetch fails', async () => {
-    const fetchFn = vi.fn(async () => new Response('bad', { status: 500 }));
-    vi.stubGlobal('fetch', fetchFn);
+    const getSvg = vi.fn(async () => {
+      throw new Error('boom');
+    });
     render(
-      <HostProvider host={makeHost(fetch)}>
+      <HostProvider host={makeHost({ apiClient: { getSvg } })}>
         <IconCell hit={failHit} />
       </HostProvider>,
     );
@@ -71,17 +57,10 @@ describe('IconCell', () => {
 
   test('invokes onSelect when clicked', async () => {
     const user = userEvent.setup();
-    const fetchFn = vi.fn(
-      async () =>
-        new Response('<svg></svg>', {
-          status: 200,
-          headers: { 'content-type': 'image/svg+xml' },
-        }),
-    );
-    vi.stubGlobal('fetch', fetchFn);
+    const getSvg = vi.fn(async () => '<svg></svg>');
     const onSelect = vi.fn();
     render(
-      <HostProvider host={makeHost(fetch)}>
+      <HostProvider host={makeHost({ apiClient: { getSvg } })}>
         <IconCell hit={hit} onSelect={onSelect} />
       </HostProvider>,
     );
@@ -91,16 +70,9 @@ describe('IconCell', () => {
   });
 
   test('sanitizes malicious SVG markup before rendering', async () => {
-    const fetchFn = vi.fn(
-      async () =>
-        new Response('<svg><script>alert(1)</script><path d="M0 0"/></svg>', {
-          status: 200,
-          headers: { 'content-type': 'image/svg+xml' },
-        }),
-    );
-    vi.stubGlobal('fetch', fetchFn);
+    const getSvg = vi.fn(async () => '<svg><script>alert(1)</script><path d="M0 0"/></svg>');
     const { container } = render(
-      <HostProvider host={makeHost(fetch)}>
+      <HostProvider host={makeHost({ apiClient: { getSvg } })}>
         <IconCell hit={maliciousHit} />
       </HostProvider>,
     );

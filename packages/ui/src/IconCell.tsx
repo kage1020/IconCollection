@@ -1,7 +1,6 @@
 import type { IconHit } from '@icon-collection/core';
-import { createApiClient } from '@icon-collection/core';
 import DOMPurify from 'dompurify';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { useHost } from './host.tsx';
 
 const sanitizeSvg = (body: string): string =>
@@ -18,7 +17,7 @@ const cacheKey = (h: IconHit) => `${h.collection}/${h.name}`;
 
 export const IconCell = ({ hit, onSelect }: IconCellProps) => {
   const host = useHost();
-  const client = useMemo(() => createApiClient({ baseUrl: host.apiBaseUrl }), [host.apiBaseUrl]);
+  const client = host.apiClient;
   const [status, setStatus] = useState<CellStatus>(() =>
     host.svgCache.has(cacheKey(hit)) ? 'ready' : 'idle',
   );
