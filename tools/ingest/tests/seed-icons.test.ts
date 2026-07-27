@@ -76,4 +76,24 @@ describe('seedIcons', () => {
     expect(account[3]).toBe('People');
     expect(account[5]).toBeNull();
   });
+
+  test('default batchSize keeps bind params under 100 per query', async () => {
+    const captured: number[] = [];
+    const execute = vi.fn(async (_sql: string, params?: readonly unknown[]) => {
+      if (params !== undefined) captured.push(params.length);
+      return okResult;
+    });
+    const client = { execute } as unknown as D1Client;
+    const icons: Record<string, { body: string }> = {};
+    for (let i = 0; i < 50; i++) icons[`i${i}`] = { body: '<path/>' };
+    const snap: CollectionSnapshot = {
+      collection: 'test',
+      version: '1',
+      license: 'MIT',
+      total: 50,
+      body: { prefix: 'test', icons } as CollectionSnapshot['body'],
+    };
+    await seedIcons({ d1: client, snapshots: [snap] });
+    for (const size of captured) expect(size).toBeLessThanOrEqual(100);
+  });
 });

@@ -24,7 +24,8 @@
 - **D1 は Cloudflare HTTP API 経由**: `POST /accounts/{account_id}/d1/database/{database_id}/query` に Bearer トークンで問い合わせ
 - **`packages/synonyms` の辞書を D1 の `synonyms` テーブルへ seed する**: `@icon-collection/synonyms` の `loadDictionary('ja')` / `loadDictionary('en')` を単一の真実として扱う
 - **`sync-r2` は sha256 の per-collection 差分で判定する**: 変更されていないコレクションは put しない
-- **`seed-d1` は collection 単位で `DELETE` + `INSERT` を 500 行バッチ、最後に `INSERT INTO icons_fts(icons_fts) VALUES('rebuild')`**: D1 の SQL サイズ上限を回避しつつ atomic に保つ
+- **`seed-d1` は collection 単位で `DELETE` + `INSERT` をバッチ実行（icons は 10 行、synonyms は 20 行）、最後に `INSERT INTO icons_fts(icons_fts) VALUES('rebuild')`**: D1 の SQL サイズ上限を回避しつつ atomic に保つ
+- **D1 bind parameter limit**: 1 query あたり 100 バインドが上限（Cloudflare 公式 limits）。seedIcons は 7 params/row なので batchSize=10、seedSynonyms は 4 params/row なので batchSize=20
 - **本プランのスコープは Iconify collection のみ**: React Icons 独自 collection の取り込みは後続プラン（Plan B'）で扱う。今回は R2 レイアウトに `react-icons/` を予約するのみで実データは書き込まない
 - **credential は環境変数で受け取る**: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `D1_DATABASE_ID`。CLI 内でハードコードしない
 - **対象コレクションは 15 個の固定リスト**: `mdi`, `lucide`, `heroicons`, `tabler`, `bi`（bootstrap-icons）, `fa6-solid`, `fa6-regular`, `fa6-brands`, `material-symbols`, `carbon`, `radix-icons`, `octicon`, `ph`（phosphor）, `simple-icons`, `vscode-icons`。この 15 個で Plan B の完成基準とし、Plan C（Web+API）はこの集合で動作確認する。追加は将来別プランで対応
@@ -94,7 +95,7 @@ tools/ingest/
 | 6 | `sync-r2.ts` | collect の結果を sha256 差分で R2 へ put |
 | 7 | `d1.ts` (client wrapper) | HTTP API 経由の `execute` / `batch` / `transaction` |
 | 8 | `seed-d1` schema migration | `schema.sql` を D1 に流し idempotent に |
-| 9 | `seed-d1` icons batch insert | 500 行バッチで `icons` テーブルを collection 単位で置換 |
+| 9 | `seed-d1` icons batch insert | 10 行バッチで `icons` テーブルを collection 単位で置換 |
 | 10 | `seed-d1` synonyms + meta seed | `packages/synonyms` から取り込み、`collection_meta` を更新 |
 | 11 | `seed-d1` FTS5 rebuild | 最後に `icons_fts` を rebuild |
 | 12 | `run.ts` orchestration | 4 段 orchestration と structured log 出力 |
@@ -1557,7 +1558,7 @@ git commit -m "feat(ingest): D1 schema for icons, icons_fts, synonyms, collectio
 - Consumes: `D1Client`, `CollectionSnapshot`
 - Produces:
   - `seedIcons(input: { d1: D1Client; snapshots: readonly CollectionSnapshot[]; batchSize?: number }): Promise<{ deleted: number; inserted: number }>`
-  - collection 単位で `DELETE FROM icons WHERE collection = ?` → `INSERT INTO icons (...) VALUES (?, ?, ?, ?, ?, ?, ?, ?)` を 500 行 (default) バッチで実行
+  - collection 単位で `DELETE FROM icons WHERE collection = ?` → `INSERT INTO icons (...) VALUES (?, ?, ?, ?, ?, ?, ?, ?)` を 10 行 (default) バッチで実行
   - `aliases`, `tags`, `categories` は Iconify の `body.icons[name].aliases` や `body.categories` を optional に取り、CSV 文字列にする（未定義なら `null`）
 
 - [ ] **Step 1: テストを書く**

@@ -1,7 +1,7 @@
 import type { D1Client } from './d1.ts';
 import type { CollectionSnapshot, IconifyJSON } from './types.ts';
 
-const DEFAULT_BATCH_SIZE = 500;
+const DEFAULT_BATCH_SIZE = 10;
 
 type IconMeta = {
   categories: string | null;

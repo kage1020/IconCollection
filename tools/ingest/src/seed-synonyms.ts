@@ -1,7 +1,7 @@
 import { loadDictionary, type SynonymDictionary } from '@icon-collection/synonyms';
 import type { D1Client } from './d1.ts';
 
-const DEFAULT_BATCH_SIZE = 500;
+const DEFAULT_BATCH_SIZE = 20;
 
 const buildInsertSql = (rowCount: number): string => {
   const placeholders = Array.from({ length: rowCount }, () => '(?, ?, ?, ?)').join(', ');

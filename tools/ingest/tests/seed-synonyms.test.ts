@@ -42,4 +42,20 @@ describe('seedSynonyms', () => {
     // 250 / 100 = 3 batches (100 + 100 + 50)
     expect(inserts.length).toBe(3);
   });
+
+  test('default batchSize keeps bind params under 100 per query', async () => {
+    const captured: number[] = [];
+    const execute = vi.fn(async (_sql: string, params?: readonly unknown[]) => {
+      if (params !== undefined) captured.push(params.length);
+      return ok;
+    });
+    const client = { execute } as unknown as D1Client;
+    const dict: SynonymDictionary = Array.from({ length: 50 }, (_, i) => ({
+      term: `t${i}`,
+      expansion: `e${i}`,
+      lang: 'en' as const,
+    }));
+    await seedSynonyms({ d1: client, dictionaries: [dict] });
+    for (const size of captured) expect(size).toBeLessThanOrEqual(100);
+  });
 });
