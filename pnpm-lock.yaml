@@ -74,6 +74,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1095.0
         version: 3.1095.0
+      '@icon-collection/core':
+        specifier: workspace:^
+        version: link:../../packages/core
       '@icon-collection/synonyms':
         specifier: workspace:^
         version: link:../../packages/synonyms
