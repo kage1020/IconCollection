@@ -1,0 +1,34 @@
+{
+  "name": "@icon-collection/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler pages dev ./dist",
+    "typecheck": "astro check && tsc -p . --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.1.5",
+    "@astrojs/preact": "^6.0.1",
+    "astro": "^7.1.4",
+    "preact": "^10.29.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20260727.1",
+    "@icon-collection/core": "workspace:^",
+    "@icon-collection/synonyms": "workspace:^",
+    "@icon-collection/ui": "workspace:^",
+    "@preact/preset-vite": "^2.10.6",
+    "@tailwindcss/vite": "^4.3.3",
+    "happy-dom": "^20.10.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
