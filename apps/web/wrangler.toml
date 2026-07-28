@@ -1,11 +1,12 @@
 name = "icon-collection-web"
 compatibility_date = "2026-01-01"
-pages_build_output_dir = "./dist"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "icon-collection"
-database_id = ""
+# Local-dev placeholder only (miniflare requires a non-empty id to name the
+# local sqlite file). Replace with the real D1 database id before deploying.
+database_id = "00000000-0000-0000-0000-000000000000"
 
 [[r2_buckets]]
 binding = "ICONS"
