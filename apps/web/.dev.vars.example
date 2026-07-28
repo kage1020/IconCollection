@@ -1,0 +1,4 @@
+# apps/web/.dev.vars.example
+# Copy to apps/web/.dev.vars for local wrangler dev (gitignored)
+# D1_DATABASE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+# R2_BUCKET=icon-collection
