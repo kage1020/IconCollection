@@ -19,4 +19,5 @@ it('adds CSP and X-Content-Type-Options headers to next response', async () => {
   expect(res.headers.get('content-security-policy')).toContain("default-src 'self'");
   expect(res.headers.get('x-content-type-options')).toBe('nosniff');
   expect(res.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
+  expect(await res.text()).toBe('ok');
 });
