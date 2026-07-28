@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@cloudflare/vitest-pool-workers": "^0.18.8",
     "@cloudflare/workers-types": "^5.20260727.1",
     "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
