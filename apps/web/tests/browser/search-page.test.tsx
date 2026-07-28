@@ -22,4 +22,7 @@ it('renders results after user types a query', async () => {
   render(<SearchPage apiBaseUrl="" />);
   await userEvent.type(screen.getByRole('searchbox'), 'home');
   await waitFor(() => expect(screen.getByLabelText('mdi/home')).toBeInTheDocument());
+
+  await userEvent.click(screen.getByLabelText('mdi/home'));
+  await waitFor(() => expect(screen.getByText('SVG')).toBeInTheDocument());
 });

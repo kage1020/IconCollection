@@ -1,7 +1,8 @@
-import type { ApiClient, SearchQuery } from '@icon-collection/core';
+import type { ApiClient, IconHit, SearchQuery } from '@icon-collection/core';
 import { createApiClient } from '@icon-collection/core';
 import type { FilterValue, Host } from '@icon-collection/ui';
 import {
+  CopyMenu,
   createSvgCache,
   FilterBar,
   HostProvider,
@@ -9,7 +10,7 @@ import {
   SearchBox,
   useSearch,
 } from '@icon-collection/ui';
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { pushToast, ToastHost } from './ToastHost.tsx';
 
 export type SearchPageProps = { apiBaseUrl: string };
@@ -49,6 +50,7 @@ const LICENSE_OPTIONS = ['Apache-2.0', 'MIT', 'ISC', 'CC-BY-4.0'] as const;
 const SearchInner = () => {
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<FilterValue>({ collection: [], license: [] });
+  const [selectedHit, setSelectedHit] = useState<IconHit | null>(null);
   const query: SearchQuery | null = q.trim()
     ? {
         q,
@@ -58,6 +60,12 @@ const SearchInner = () => {
       }
     : null;
   const state = useSearch(query);
+
+  // 検索条件が変わると同じ選択が別の結果を指す可能性があるため、選択状態をクリアする。
+  useEffect(() => {
+    setSelectedHit(null);
+  }, [q, filter]);
+
   return (
     <div class="flex flex-col gap-4">
       <SearchBox initialValue={q} onChange={setQ} placeholder="Search icons…" />
@@ -70,8 +78,25 @@ const SearchInner = () => {
       {state.status === 'error' ? (
         <p class="text-red-600">Error: {state.error?.message}</p>
       ) : (
-        <IconGrid hits={state.data?.hits ?? []} />
+        <IconGrid hits={state.data?.hits ?? []} onSelect={setSelectedHit} />
       )}
+      {selectedHit ? (
+        <div class="flex flex-col gap-2 rounded border border-neutral-200 p-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium">
+              {selectedHit.collection}/{selectedHit.name}
+            </span>
+            <button
+              type="button"
+              class="rounded border border-neutral-300 px-2 py-1 text-xs hover:border-neutral-500"
+              onClick={() => setSelectedHit(null)}
+            >
+              Close
+            </button>
+          </div>
+          <CopyMenu hit={selectedHit} />
+        </div>
+      ) : null}
     </div>
   );
 };
