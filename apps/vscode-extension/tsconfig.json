@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": ["node", "vscode"],
+    "outDir": "dist",
+    "verbatimModuleSyntax": false
+  },
+  "files": [],
+  "include": []
+}
