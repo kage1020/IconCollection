@@ -1,7 +1,8 @@
 import { describe, expect, test, vi } from 'vitest';
-import type { D1Client, D1Result } from '../src/d1.ts';
+import type { D1Client } from '../src/d1.ts';
 import { seedIcons } from '../src/seed-icons.ts';
 import type { CollectionSnapshot } from '../src/types.ts';
+import { makeFakeBatchAtomic } from './_helpers.ts';
 
 const snap = (): CollectionSnapshot => ({
   collection: 'mdi',
@@ -29,19 +30,7 @@ const snap = (): CollectionSnapshot => ({
 
 const okResult = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
 
-// Simulates D1's real reporting: each INSERT statement's meta.changes equals the
-// number of value-tuples in its VALUES clause, the DELETE reports 0.
-// NOTE: intentionally a plain function, not vi.fn — wrapping an existing vi.fn in
-// another vi.fn() shares its call-history state across tests.
-const fakeBatchAtomic = async (
-  stmts: readonly { sql: string; params?: readonly unknown[] }[],
-): Promise<D1Result[]> =>
-  stmts.map((s) => {
-    const rowCount = s.sql.startsWith('INSERT')
-      ? (s.sql.match(/\([^()]*\?[^()]*\)/g)?.length ?? 0)
-      : 0;
-    return { success: true, meta: { changes: rowCount, last_row_id: null }, results: [] };
-  });
+const fakeBatchAtomic = makeFakeBatchAtomic();
 
 describe('seedIcons', () => {
   test('deletes then inserts icons for each collection via a single atomic batch', async () => {

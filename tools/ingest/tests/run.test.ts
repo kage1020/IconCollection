@@ -5,6 +5,7 @@ import type { D1Client } from '../src/d1.ts';
 import type { R2Client } from '../src/r2.ts';
 import { run } from '../src/run.ts';
 import type { IngestConfig } from '../src/types.ts';
+import { makeFakeBatchAtomic } from './_helpers.ts';
 
 const fixturePath = (name: string): string =>
   fileURLToPath(new URL(`../__fixtures__/${name}`, import.meta.url));
@@ -18,15 +19,7 @@ const baseConfig: IngestConfig = {
 
 const okResult = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
 
-// Simulates D1's real reporting: each INSERT statement's meta.changes equals the
-// number of value-tuples in its VALUES clause, the DELETE reports 0.
-const fakeBatchAtomic = async (stmts: readonly { sql: string; params?: readonly unknown[] }[]) =>
-  stmts.map((s) => {
-    const rowCount = s.sql.startsWith('INSERT')
-      ? (s.sql.match(/\([^()]*\?[^()]*\)/g)?.length ?? 0)
-      : 0;
-    return { success: true, meta: { changes: rowCount, last_row_id: null }, results: [] };
-  });
+const fakeBatchAtomic = makeFakeBatchAtomic();
 
 describe('run', () => {
   test('performs detect -> collect -> sync-r2 -> seed-d1 and returns a report', async () => {
