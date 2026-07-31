@@ -2,11 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": [],
+    "types": ["node"],
     "jsx": "preserve",
     "jsxImportSource": "preact",
     "outDir": "dist/webview"
   },
   "files": [],
-  "include": []
+  "include": ["src/webview/**/*", "tests/webview-host.test.ts"]
 }
