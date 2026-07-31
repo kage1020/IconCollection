@@ -27,4 +27,13 @@ export default defineConfig([
     },
     loader: { '.css': 'copy' },
   },
+  {
+    entry: { 'integration/activation.test': 'tests/integration/activation.test.ts' },
+    format: ['cjs'],
+    platform: 'node',
+    target: 'node22',
+    external: ['vscode', 'mocha', 'assert'],
+    outDir: 'dist',
+    sourcemap: true,
+  },
 ]);

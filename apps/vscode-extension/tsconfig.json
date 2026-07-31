@@ -4,10 +4,15 @@
     "module": "CommonJS",
     "target": "ES2022",
     "lib": ["ES2022"],
-    "types": ["node", "vscode"],
+    "types": ["node", "vscode", "mocha"],
     "outDir": "dist",
     "verbatimModuleSyntax": false
   },
   "files": [],
-  "include": ["src/extension.ts", "src/host-adapter.ts", "tests/host-adapter.test.ts"]
+  "include": [
+    "src/extension.ts",
+    "src/host-adapter.ts",
+    "tests/host-adapter.test.ts",
+    "tests/integration/activation.test.ts"
+  ]
 }

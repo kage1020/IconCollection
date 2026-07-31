@@ -39,6 +39,9 @@ importers:
       '@icon-collection/ui':
         specifier: workspace:^
         version: link:../../packages/ui
+      '@types/mocha':
+        specifier: ^10.0.10
+        version: 10.0.10
       '@types/node':
         specifier: ^26.1.1
         version: 26.1.1

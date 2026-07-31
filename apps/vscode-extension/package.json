@@ -1,5 +1,5 @@
 {
-  "name": "@icon-collection/vscode-extension",
+  "name": "icon-collection",
   "displayName": "Icon Collection",
   "description": "Viewer of icon library with SVG.",
   "version": "0.2.0",
@@ -84,6 +84,7 @@
     "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
     "@icon-collection/ui": "workspace:^",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
     "@types/vscode": "^1.125.0",
     "@vscode/test-cli": "^0.0.15",

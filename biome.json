@@ -15,7 +15,8 @@
       "!**/coverage",
       "!**/parsers",
       "!**/extension",
-      "!apps/vscode-extension/images"
+      "!apps/vscode-extension/images",
+      "!apps/vscode-extension/.vscode-test"
     ]
   },
   "formatter": {
