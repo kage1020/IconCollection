@@ -68,7 +68,8 @@
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm run build:css",
+    "build:css": "tailwindcss -i src/webview/main.css -o dist/webview/main.css --minify",
     "dev": "tsup --watch",
     "vscode:prepublish": "pnpm run build",
     "package": "vsce package --no-dependencies",
@@ -84,6 +85,7 @@
     "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
     "@icon-collection/ui": "workspace:^",
+    "@tailwindcss/cli": "^4.3.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
     "@types/vscode": "~1.87.0",
