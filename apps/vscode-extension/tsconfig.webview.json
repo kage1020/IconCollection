@@ -2,6 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // "node" is required so tsc can resolve the Buffer fallback in @icon-collection/ui format.ts.
+    // The fallback never runs in the WebView (btoa is always defined) but the type reference must resolve.
     "types": ["node"],
     "jsx": "preserve",
     "jsxImportSource": "preact",
