@@ -66,4 +66,13 @@ describe('GET /api/search', () => {
     expect(body.total).toBe(2);
     expect(typeof body.cursor).toBe('string');
   });
+
+  it('sets cache-control: no-store when expandQuery yields empty FTS terms', async () => {
+    const res = await call('/api/search?q=%2A');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { hits: unknown[]; total: number; cursor: string | null };
+    expect(body.hits).toEqual([]);
+    expect(body.total).toBe(0);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+  });
 });
