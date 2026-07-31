@@ -4,7 +4,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [
     cloudflareTest({
-      wrangler: { configPath: './wrangler.toml' },
+      wrangler: { configPath: './wrangler.jsonc' },
       miniflare: {
         compatibilityDate: '2026-01-01',
         d1Databases: ['DB'],

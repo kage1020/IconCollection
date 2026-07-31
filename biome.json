@@ -14,7 +14,9 @@
       "!**/.wrangler",
       "!**/coverage",
       "!**/parsers",
-      "!**/extension"
+      "!**/extension",
+      "!apps/vscode-extension/images",
+      "!apps/vscode-extension/.vscode-test"
     ]
   },
   "formatter": {

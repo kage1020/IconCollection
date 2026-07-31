@@ -8,3 +8,5 @@ dist/
 .turbo/
 coverage/
 *.tsbuildinfo
+.vscode-test/
+*.vsix

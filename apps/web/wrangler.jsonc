@@ -1,19 +1,19 @@
 {
-	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "icon-collection-web",
-	"compatibility_date": "2026-07-01",
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "icon-collection",
-			"database_id": "20d8d7b6-c217-4ae9-8825-4807e0242fcc",
-			"remote": true
-		}
-	],
-	"r2_buckets": [
-		{
-			"binding": "ICONS",
-			"bucket_name": "icon-collection"
-		}
-	]
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "icon-collection-web",
+  "compatibility_date": "2026-07-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "icon-collection",
+      "database_id": "20d8d7b6-c217-4ae9-8825-4807e0242fcc",
+      "remote": true
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ICONS",
+      "bucket_name": "icon-collection"
+    }
+  ]
 }
