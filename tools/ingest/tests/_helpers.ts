@@ -11,7 +11,7 @@ export const makeFakeBatchAtomic =
     stmts.map((stmt) => ({
       success: true,
       meta: {
-        changes: /^\s*INSERT/i.test(stmt.sql) ? rowCountFromSql(stmt.sql) : 0,
+        changes: stmt.sql.startsWith('INSERT') ? rowCountFromSql(stmt.sql) : 0,
         last_row_id: null,
       },
       results: [],
