@@ -35,8 +35,8 @@ describe('run', () => {
       r2,
       d1,
       readVersion: async () => '2.2.500',
-      collect: async (collection, version) =>
-        collectFromPath(fixturePath(`${collection}-mini.json`), version),
+      collect: async ({ collection }) =>
+        collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500'),
     });
     expect(report.collectionsChecked).toBe(2);
     expect(report.collectionsChanged.sort()).toEqual(['lucide', 'mdi']);
@@ -62,9 +62,9 @@ describe('run', () => {
       r2,
       d1,
       readVersion: async () => '2.2.500',
-      collect: async (c, v) => {
-        collectSpy(c, v);
-        return collectFromPath(fixturePath(`${c}-mini.json`), v);
+      collect: async ({ collection }) => {
+        collectSpy(collection);
+        return collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500');
       },
     });
     expect(report.collectionsChanged).toEqual([]);
@@ -90,7 +90,8 @@ describe('run', () => {
         r2,
         d1,
         readVersion: async () => '2.2.500',
-        collect: async (c, v) => collectFromPath(fixturePath(`${c}-mini.json`), v),
+        collect: async ({ collection }) =>
+          collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500'),
       },
     );
     // schema apply may still run, but no INSERT INTO icons
@@ -121,7 +122,8 @@ describe('run', () => {
         r2,
         d1,
         readVersion: async () => '2.2.500',
-        collect: async (c, v) => collectFromPath(fixturePath(`${c}-mini.json`), v),
+        collect: async ({ collection }) =>
+          collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500'),
       }),
     ).rejects.toThrow('boom');
     expect(r2Puts.find(([k]) => k === 'meta/version.json')).toBeUndefined();
@@ -149,7 +151,8 @@ describe('run', () => {
       r2,
       d1,
       readVersion: async () => '2.2.500',
-      collect: async (c, v) => collectFromPath(fixturePath(`${c}-mini.json`), v),
+      collect: async ({ collection }) =>
+        collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500'),
     });
     const ftsIdx = events.indexOf('fts:rebuild');
     const metaIdx = events.indexOf('put:meta/version.json');
