@@ -28,7 +28,7 @@ describe('createVscodeHost', () => {
 
   it('resolves persistState.get from inbound persistGetResult message', async () => {
     const vscode = makeVscode();
-    let handler: ((msg: unknown) => void) = () => {};
+    let handler: (msg: unknown) => void = () => {};
     const host = createVscodeHost({
       vscode,
       init: { apiBaseUrl: 'https://x.test', defaultLimit: 60 },
