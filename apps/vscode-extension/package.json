@@ -21,6 +21,15 @@
   "activationEvents": [],
   "main": "./dist/extension.cjs",
   "icon": "./images/icon.png",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "restrictedConfigurations": [
+        "iconCollection.apiBaseUrl",
+        "iconCollection.defaultLimit"
+      ]
+    }
+  },
   "contributes": {
     "views": {
       "IconCollection": [

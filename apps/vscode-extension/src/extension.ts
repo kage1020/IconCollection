@@ -106,6 +106,9 @@ class IconCollectionProvider implements vscode.WebviewViewProvider {
     const mainCss = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(distRoot, 'main.css'));
     const init = host.getInitPayload();
     const nonce = makeNonce();
+    // init.apiBaseUrl is pre-sanitized by host-adapter's sanitizeApiBaseUrl
+    // (https-only, no CSP-hostile characters, origin-only) before it ever
+    // reaches this CSP interpolation or the HTML attribute below.
     const csp = buildCsp(nonce, init.apiBaseUrl);
     webviewView.webview.html = buildHtml(nonce, csp, mainJs, mainCss);
 
