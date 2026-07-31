@@ -18,13 +18,26 @@ const baseConfig: IngestConfig = {
 
 const okResult = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
 
+// Simulates D1's real reporting: each INSERT statement's meta.changes equals the
+// number of value-tuples in its VALUES clause, the DELETE reports 0.
+const fakeBatchAtomic = async (stmts: readonly { sql: string; params?: readonly unknown[] }[]) =>
+  stmts.map((s) => {
+    const rowCount = s.sql.startsWith('INSERT')
+      ? (s.sql.match(/\([^()]*\?[^()]*\)/g)?.length ?? 0)
+      : 0;
+    return { success: true, meta: { changes: rowCount, last_row_id: null }, results: [] };
+  });
+
 describe('run', () => {
   test('performs detect -> collect -> sync-r2 -> seed-d1 and returns a report', async () => {
     const r2 = {
       putJson: vi.fn(async () => ({ changed: true, sha256: 'x' })),
       getJson: vi.fn(async () => null),
     } as unknown as R2Client;
-    const d1 = { execute: vi.fn(async () => okResult) } as unknown as D1Client;
+    const d1 = {
+      execute: vi.fn(async () => okResult),
+      batchAtomic: vi.fn(fakeBatchAtomic),
+    } as unknown as D1Client;
     const report = await run(baseConfig, {
       r2,
       d1,
@@ -47,7 +60,10 @@ describe('run', () => {
         key === 'meta/version.json' ? { mdi: '2.2.500', lucide: '2.2.500' } : null,
       ),
     } as unknown as R2Client;
-    const d1 = { execute: vi.fn(async () => okResult) } as unknown as D1Client;
+    const d1 = {
+      execute: vi.fn(async () => okResult),
+      batchAtomic: vi.fn(fakeBatchAtomic),
+    } as unknown as D1Client;
     const collectSpy = vi.fn();
     const report = await run(baseConfig, {
       r2,
@@ -99,11 +115,12 @@ describe('run', () => {
       getJson: vi.fn(async () => null),
     } as unknown as R2Client;
     const d1 = {
-      execute: vi.fn(async (sql: string) => {
-        if (sql.startsWith('INSERT INTO icons ')) {
+      execute: vi.fn(async () => okResult),
+      batchAtomic: vi.fn(async (stmts: readonly { sql: string }[]) => {
+        if (stmts.some((s) => s.sql.startsWith('INSERT INTO icons '))) {
           throw new Error('boom');
         }
-        return okResult;
+        return stmts.map(() => okResult);
       }),
     } as unknown as D1Client;
     await expect(
@@ -133,6 +150,7 @@ describe('run', () => {
         }
         return okResult;
       }),
+      batchAtomic: vi.fn(fakeBatchAtomic),
     } as unknown as D1Client;
     await run(baseConfig, {
       r2,

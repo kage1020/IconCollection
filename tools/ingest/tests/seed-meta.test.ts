@@ -10,6 +10,8 @@ const snap = (collection: string): CollectionSnapshot => ({
   version: '2.2.400',
   license: 'MIT',
   total: 10,
+  defaultWidth: 24,
+  defaultHeight: 24,
   body: { prefix: collection, icons: {} } as CollectionSnapshot['body'],
 });
 
@@ -37,5 +39,30 @@ describe('seedCollectionMeta', () => {
     expect(params[2]).toBe('MIT');
     expect(params[3]).toBe(10);
     expect(typeof params[4]).toBe('number');
+  });
+
+  test('writes default_width and default_height', async () => {
+    const execute = vi.fn(async () => ({
+      success: true,
+      meta: { changes: 1, last_row_id: null },
+      results: [],
+    }));
+    const d1 = { execute } as unknown as D1Client;
+    const makeSnap = (over: Partial<CollectionSnapshot> = {}): CollectionSnapshot => ({
+      collection: 'mdi',
+      version: '1.0.0',
+      license: 'Apache-2.0',
+      total: 10,
+      defaultWidth: 24,
+      defaultHeight: 24,
+      body: { prefix: 'mdi', icons: {}, info: {} as never },
+      ...over,
+    });
+    await seedCollectionMeta({
+      d1,
+      snapshots: [makeSnap({ defaultWidth: 32, defaultHeight: 32 })],
+    });
+    const calls = execute.mock.calls as unknown as Array<[string, readonly unknown[]]>;
+    expect(calls[0]?.[1]).toEqual(['mdi', '1.0.0', 'Apache-2.0', 10, 32, 32, expect.any(Number)]);
   });
 });

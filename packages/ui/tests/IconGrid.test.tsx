@@ -1,15 +1,8 @@
 import type { IconHit } from '@icon-collection/core';
 import { render, screen } from '@testing-library/preact';
-import { describe, expect, test, vi } from 'vitest';
-import type { Host } from '../src/index.ts';
+import { describe, expect, test } from 'vitest';
 import { HostProvider, IconGrid } from '../src/index.ts';
-
-const makeHost = (): Host => ({
-  apiBaseUrl: 'https://x.example',
-  copyText: async () => {},
-  showToast: () => {},
-  persistState: { get: async () => null, set: async () => {} },
-});
+import { makeHost } from './_helpers.ts';
 
 const hits: IconHit[] = Array.from({ length: 12 }, (_, i) => ({
   collection: 'mdi',
@@ -21,10 +14,6 @@ const hits: IconHit[] = Array.from({ length: 12 }, (_, i) => ({
 
 describe('IconGrid', () => {
   test('renders every hit', () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('<svg/>')),
-    );
     render(
       <HostProvider host={makeHost()}>
         <IconGrid hits={hits} columns={4} cellSize={72} />

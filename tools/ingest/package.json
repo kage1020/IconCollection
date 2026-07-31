@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1095.0",
+    "@icon-collection/core": "workspace:^",
     "@icon-collection/synonyms": "workspace:^",
     "@iconify/types": "^2.0.0"
   }

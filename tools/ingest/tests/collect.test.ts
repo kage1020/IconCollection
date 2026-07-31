@@ -36,4 +36,16 @@ describe('collectFromIconify', () => {
   test('throws when the collection is not present in @iconify/json', async () => {
     await expect(collectFromIconify('this-does-not-exist', '2.2.400')).rejects.toThrow();
   });
+
+  test('extracts default width/height from Iconify JSON, falling back to 24', async () => {
+    const cases = [
+      { body: { prefix: 'a', info: {}, icons: {}, width: 32, height: 32 }, expected: [32, 32] },
+      { body: { prefix: 'b', info: {}, icons: {} }, expected: [24, 24] },
+    ] as const;
+    for (const c of cases) {
+      const input = { collection: c.body.prefix, load: async () => c.body as never };
+      const snap = await collectFromIconify(input);
+      expect([snap.defaultWidth, snap.defaultHeight]).toEqual(c.expected);
+    }
+  });
 });

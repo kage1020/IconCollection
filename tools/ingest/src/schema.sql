@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS synonyms (
 );
 
 CREATE TABLE IF NOT EXISTS collection_meta (
-  collection TEXT PRIMARY KEY,
-  version    TEXT NOT NULL,
-  license    TEXT NOT NULL,
-  total      INTEGER NOT NULL,
-  synced_at  INTEGER NOT NULL
+  collection     TEXT PRIMARY KEY,
+  version        TEXT NOT NULL,
+  license        TEXT NOT NULL,
+  total          INTEGER NOT NULL,
+  default_width  INTEGER NOT NULL DEFAULT 24,
+  default_height INTEGER NOT NULL DEFAULT 24,
+  synced_at      INTEGER NOT NULL
 );

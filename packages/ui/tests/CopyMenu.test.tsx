@@ -2,8 +2,8 @@ import type { IconHit } from '@icon-collection/core';
 import { render, screen, waitFor } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
-import type { Host } from '../src/index.ts';
 import { CopyMenu, HostProvider } from '../src/index.ts';
+import { makeHost } from './_helpers.ts';
 
 const hit: IconHit = {
   collection: 'mdi',
@@ -13,32 +13,13 @@ const hit: IconHit = {
   height: 24,
 };
 
-const setupHost = () => {
-  const copyText = vi.fn(async () => {});
-  const showToast = vi.fn();
-  const host: Host = {
-    apiBaseUrl: 'https://x.example',
-    copyText,
-    showToast,
-    persistState: { get: async () => null, set: async () => {} },
-  };
-  return { host, copyText, showToast };
-};
-
 describe('CopyMenu', () => {
   test('SVG button copies raw SVG', async () => {
     const user = userEvent.setup();
-    const { host, copyText, showToast } = setupHost();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(
-        async () =>
-          new Response('<svg class="a"/>', {
-            status: 200,
-            headers: { 'content-type': 'image/svg+xml' },
-          }),
-      ),
-    );
+    const copyText = vi.fn(async () => {});
+    const showToast = vi.fn();
+    const getSvg = vi.fn(async () => '<svg class="a"/>');
+    const host = makeHost({ copyText, showToast, apiClient: { getSvg } });
     render(
       <HostProvider host={host}>
         <CopyMenu hit={hit} />
@@ -51,17 +32,9 @@ describe('CopyMenu', () => {
 
   test('JSX button copies JSX-formatted SVG', async () => {
     const user = userEvent.setup();
-    const { host, copyText } = setupHost();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(
-        async () =>
-          new Response('<svg class="a"/>', {
-            status: 200,
-            headers: { 'content-type': 'image/svg+xml' },
-          }),
-      ),
-    );
+    const copyText = vi.fn(async () => {});
+    const getSvg = vi.fn(async () => '<svg class="a"/>');
+    const host = makeHost({ copyText, apiClient: { getSvg } });
     render(
       <HostProvider host={host}>
         <CopyMenu hit={hit} />
@@ -73,17 +46,9 @@ describe('CopyMenu', () => {
 
   test('Diagram button copies mx from the server', async () => {
     const user = userEvent.setup();
-    const { host, copyText } = setupHost();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(
-        async () =>
-          new Response('<mxGraphModel/>', {
-            status: 200,
-            headers: { 'content-type': 'application/xml' },
-          }),
-      ),
-    );
+    const copyText = vi.fn(async () => {});
+    const getMx = vi.fn(async () => '<mxGraphModel/>');
+    const host = makeHost({ copyText, apiClient: { getMx } });
     render(
       <HostProvider host={host}>
         <CopyMenu hit={hit} />
@@ -95,17 +60,17 @@ describe('CopyMenu', () => {
 
   test('reports failure via toast when fetch fails', async () => {
     const user = userEvent.setup();
-    const { host, showToast } = setupHost();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('boom', { status: 500 })),
-    );
+    const showToast = vi.fn();
+    const getSvg = vi.fn(async () => {
+      throw new Error('boom');
+    });
+    const host = makeHost({ showToast, apiClient: { getSvg } });
     render(
       <HostProvider host={host}>
         <CopyMenu hit={hit} />
       </HostProvider>,
     );
     await user.click(screen.getByRole('button', { name: 'SVG' }));
-    await waitFor(() => expect(showToast).toHaveBeenCalledWith('Copy failed'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('Copy failed: boom'));
   });
 });

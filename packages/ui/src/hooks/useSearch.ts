@@ -1,6 +1,5 @@
 import type { SearchQuery, SearchResponse } from '@icon-collection/core';
-import { createApiClient } from '@icon-collection/core';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { useHost } from '../host.tsx';
 
 export type SearchStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -15,7 +14,7 @@ const IDLE: SearchState = { status: 'idle', data: null, error: null };
 
 export const useSearch = (query: SearchQuery | null): SearchState => {
   const host = useHost();
-  const client = useMemo(() => createApiClient({ baseUrl: host.apiBaseUrl }), [host.apiBaseUrl]);
+  const client = host.apiClient;
   const [state, setState] = useState<SearchState>(IDLE);
   const genRef = useRef(0);
   const key = query ? JSON.stringify(query) : null;

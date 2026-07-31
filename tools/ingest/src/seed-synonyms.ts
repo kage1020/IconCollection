@@ -18,16 +18,18 @@ export const seedSynonyms = async (input: SeedSynonymsInput): Promise<{ inserted
   const batchSize = input.batchSize ?? DEFAULT_BATCH_SIZE;
   const dicts = input.dictionaries ?? [loadDictionary('ja'), loadDictionary('en')];
   const entries = dicts.flatMap((d) => Array.from(d));
-  await input.d1.execute('DELETE FROM synonyms');
-  let inserted = 0;
+  const statements: { sql: string; params: readonly unknown[] }[] = [
+    { sql: 'DELETE FROM synonyms', params: [] },
+  ];
   for (let offset = 0; offset < entries.length; offset += batchSize) {
     const chunk = entries.slice(offset, offset + batchSize);
     const params: unknown[] = [];
     for (const entry of chunk) {
       params.push(entry.term, entry.expansion, entry.lang, entry.weight ?? 1.0);
     }
-    await input.d1.execute(buildInsertSql(chunk.length), params);
-    inserted += chunk.length;
+    statements.push({ sql: buildInsertSql(chunk.length), params });
   }
+  const results = await input.d1.batchAtomic(statements);
+  const inserted = results.slice(1).reduce((n, r) => n + r.meta.changes, 0);
   return { inserted };
 };

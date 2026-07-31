@@ -1,0 +1,10 @@
+---
+import { SearchPage } from '../islands/SearchPage.tsx';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="IconCollection">
+  <main class="mx-auto flex max-w-6xl flex-col gap-6 p-6">
+    <h1 class="text-2xl font-semibold">IconCollection</h1>
+    <SearchPage client:load apiBaseUrl="" />
+  </main>
+</BaseLayout>

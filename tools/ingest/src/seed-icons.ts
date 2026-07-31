@@ -55,11 +55,12 @@ export const seedIcons = async (
   let deleted = 0;
   let inserted = 0;
   for (const snap of input.snapshots) {
-    await input.d1.execute('DELETE FROM icons WHERE collection = ?', [snap.collection]);
-    deleted++;
     const index = buildIndex(snap.body);
     const names = Object.keys(snap.body.icons);
     const updatedAt = Math.floor(Date.now() / 1000);
+    const statements: { sql: string; params: readonly unknown[] }[] = [
+      { sql: 'DELETE FROM icons WHERE collection = ?', params: [snap.collection] },
+    ];
     for (let offset = 0; offset < names.length; offset += batchSize) {
       const chunk = names.slice(offset, offset + batchSize);
       const params: unknown[] = [];
@@ -75,9 +76,11 @@ export const seedIcons = async (
           updatedAt,
         );
       }
-      await input.d1.execute(buildInsertSql(chunk.length), params);
-      inserted += chunk.length;
+      statements.push({ sql: buildInsertSql(chunk.length), params });
     }
+    const results = await input.d1.batchAtomic(statements);
+    deleted++;
+    inserted += results.slice(1).reduce((n, r) => n + r.meta.changes, 0);
   }
   return { deleted, inserted };
 };
