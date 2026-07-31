@@ -35,7 +35,7 @@
 
 **Interfaces:**
 - Consumes: 旧 `extension/CHANGELOG.md` の履歴 + images/*
-- Produces: 新 workspace `@icon-collection/vscode-extension`。以降のタスクで `src/` と `tests/` を埋める
+- Produces: 新 workspace `icon-collection`。以降のタスクで `src/` と `tests/` を埋める
 
 - [ ] **Step 1: images をコピー**
 
@@ -48,7 +48,7 @@ cp extension/images/icon.png extension/images/icon.svg apps/vscode-extension/ima
 
 ```json
 {
-  "name": "@icon-collection/vscode-extension",
+  "name": "icon-collection",
   "displayName": "Icon Collection",
   "description": "Viewer of icon library with SVG.",
   "version": "0.2.0",
@@ -121,8 +121,8 @@ cp extension/images/icon.png extension/images/icon.svg apps/vscode-extension/ima
 - [ ] **Step 3: 依存 install (pnpm CLI 経由、バージョンハードコード禁止)**
 
 ```bash
-pnpm -F @icon-collection/vscode-extension add preact
-pnpm -F @icon-collection/vscode-extension add -D \
+pnpm -F icon-collection add preact
+pnpm -F icon-collection add -D \
   @icon-collection/core@workspace:^ \
   @icon-collection/synonyms@workspace:^ \
   @icon-collection/ui@workspace:^ \
@@ -208,7 +208,7 @@ CHANGELOG.md
 
 ```bash
 pnpm install
-pnpm -F @icon-collection/vscode-extension typecheck
+pnpm -F icon-collection typecheck
 ```
 
 Expected: `pnpm-workspace.yaml` の `apps/*` により自動で workspace 認識、typecheck は src/ 空でも `include` 内ファイル 0 で warning のみ (エラーなし)。
@@ -270,7 +270,7 @@ Tailwind の統合は `@tailwindcss/vite` が tsup に直接載らないため�
 - [ ] **Step 2: build 実行 (src/ 未実装なので空エントリで failure OK — Task 3 以降で埋める。ここでは config だけ commit する)**
 
 ```bash
-pnpm -F @icon-collection/vscode-extension build 2>&1 | head -20
+pnpm -F icon-collection build 2>&1 | head -20
 ```
 
 Expected: `src/extension.ts` / `src/webview/main.tsx` 不在で ENOENT。想定内。次タスクで解消。
@@ -386,7 +386,7 @@ describe('createVscodeHost', () => {
 
 - [ ] **Step 2: 失敗を確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension test`
+Run: `pnpm -F icon-collection test`
 Expected: `createVscodeHost` 未実装で全 5 fail。
 
 - [ ] **Step 3: 実装**
@@ -459,12 +459,12 @@ export const createVscodeHost = (input: CreateVscodeHostInput): Host => {
 
 - [ ] **Step 4: テスト green を確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension test`
+Run: `pnpm -F icon-collection test`
 Expected: 5 passing。
 
 - [ ] **Step 5: typecheck / lint**
 
-Run: `pnpm -F @icon-collection/vscode-extension typecheck && pnpm lint`
+Run: `pnpm -F icon-collection typecheck && pnpm lint`
 Expected: clean。
 
 - [ ] **Step 6: commit**
@@ -645,7 +645,7 @@ initReady.then((init) => {
 
 - [ ] **Step 4: build 通過確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension build`
+Run: `pnpm -F icon-collection build`
 Expected: `dist/extension.cjs` は Task 5 まで未実装で fail する可能性あり。webview だけビルドしたい場合は tsup に entry filter がないので、ここでは失敗 OK。
 
 Step-by-step で:
@@ -751,7 +751,7 @@ describe('createExtensionHost', () => {
 
 - [ ] **Step 2: 失敗を確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension test`
+Run: `pnpm -F icon-collection test`
 Expected: 4 fail (`createExtensionHost` 未実装)。
 
 - [ ] **Step 3: 実装 host-adapter.ts**
@@ -936,17 +936,17 @@ export const deactivate = (): void => undefined;
 
 - [ ] **Step 5: テスト green を確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension test`
+Run: `pnpm -F icon-collection test`
 Expected: 9/9 passing (5 vscode-host + 4 host-adapter)。
 
 - [ ] **Step 6: build 通過確認**
 
-Run: `pnpm -F @icon-collection/vscode-extension build`
+Run: `pnpm -F icon-collection build`
 Expected: `dist/extension.cjs` と `dist/webview/main.js` + `dist/webview/main.css` 生成、exit 0。
 
 - [ ] **Step 7: typecheck / lint**
 
-Run: `pnpm -F @icon-collection/vscode-extension typecheck && pnpm lint`
+Run: `pnpm -F icon-collection typecheck && pnpm lint`
 Expected: clean。
 
 - [ ] **Step 8: commit**
@@ -1018,7 +1018,7 @@ integration test は Mocha が `dist/integration/**/*.test.js` を読むため�
 
 - [ ] **Step 4: local で integration 実行 (CI は Task 8 で組み込む)**
 
-Run: `pnpm -F @icon-collection/vscode-extension build && pnpm -F @icon-collection/vscode-extension test:integration`
+Run: `pnpm -F icon-collection build && pnpm -F icon-collection test:integration`
 Expected: PASS 1 (activation)、Electron 起動あり。CI では xvfb / headless 必要 (Task 8 で対応)。
 
 Local で Electron が落ちる場合 (Windows で GPU 不可等) は `--disable-gpu` 追加。plan には汎用手順のみ記載、環境固有は README に。
@@ -1043,7 +1043,7 @@ git commit -m "test(vscode-extension): add activation smoke test"
 - [ ] **Step 1: README.md**
 
 ```markdown
-# @icon-collection/vscode-extension
+# icon-collection
 
 Icon Collection の VSCode 拡張。Cloudflare Pages でホストされている検索 API と icon delivery を叩く WebView を提供する。
 
@@ -1063,20 +1063,20 @@ Icon Collection の VSCode 拡張。Cloudflare Pages でホストされている
 ## Development
 
 ```bash
-pnpm -F @icon-collection/vscode-extension dev    # tsup --watch
+pnpm -F icon-collection dev    # tsup --watch
 # In another shell:
 # VSCode で apps/vscode-extension を開き、F5 でデバッグ実行
 ```
 
 ## Test
 
-- `pnpm -F @icon-collection/vscode-extension test` — Vitest unit tests
-- `pnpm -F @icon-collection/vscode-extension test:integration` — @vscode/test-electron activation smoke
+- `pnpm -F icon-collection test` — Vitest unit tests
+- `pnpm -F icon-collection test:integration` — @vscode/test-electron activation smoke
 
 ## Package
 
 ```bash
-pnpm -F @icon-collection/vscode-extension package
+pnpm -F icon-collection package
 ```
 
 `icon-collection-0.2.0.vsix` が生成される。
@@ -1138,7 +1138,7 @@ git commit -m "docs(vscode-extension): document runtime, settings, and OIDC publ
 
 **Files:**
 - Create: `.github/workflows/vsce-publish.yml`
-- Modify: `.github/workflows/ci.yml` — `pnpm -F @icon-collection/vscode-extension test` と `build` を CI に含める
+- Modify: `.github/workflows/ci.yml` — `pnpm -F icon-collection test` と `build` を CI に含める
 
 **Interfaces:** none
 
@@ -1147,7 +1147,7 @@ git commit -m "docs(vscode-extension): document runtime, settings, and OIDC publ
 `.github/workflows/ci.yml` の末尾に:
 
 ```yaml
-      - run: pnpm -F @icon-collection/vscode-extension build
+      - run: pnpm -F icon-collection build
 ```
 
 `pnpm test` は既に workspace 全体を回すので個別追加不要。
@@ -1178,9 +1178,9 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -F @icon-collection/vscode-extension typecheck
-      - run: pnpm -F @icon-collection/vscode-extension test
-      - run: pnpm -F @icon-collection/vscode-extension build
+      - run: pnpm -F icon-collection typecheck
+      - run: pnpm -F icon-collection test
+      - run: pnpm -F icon-collection build
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
@@ -1191,7 +1191,7 @@ jobs:
         env:
           VSCE_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          pnpm -F @icon-collection/vscode-extension exec vsce publish \
+          pnpm -F icon-collection exec vsce publish \
             --azure-credential
       - name: Upload vsix artifact
         uses: actions/upload-artifact@v4
@@ -1205,7 +1205,7 @@ jobs:
 
 - [ ] **Step 3: local dry-run (Actions は本番でしか発火しない)**
 
-Run: `pnpm -F @icon-collection/vscode-extension typecheck && pnpm -F @icon-collection/vscode-extension test && pnpm -F @icon-collection/vscode-extension build && pnpm -F @icon-collection/vscode-extension package`
+Run: `pnpm -F icon-collection typecheck && pnpm -F icon-collection test && pnpm -F icon-collection build && pnpm -F icon-collection package`
 Expected: `.vsix` 生成、exit 0
 
 - [ ] **Step 4: PR 作成**
@@ -1219,10 +1219,10 @@ gh pr create --title "feat: rewrite VSCode extension with Preact + Plan C API" -
 - Publish を PAT から Azure OIDC federated credential に移行
 
 ## Test plan
-- [ ] pnpm -F @icon-collection/vscode-extension test — unit 9/9 pass
-- [ ] pnpm -F @icon-collection/vscode-extension typecheck — clean
-- [ ] pnpm -F @icon-collection/vscode-extension build — dist/{extension.cjs, webview/main.js, webview/main.css} 生成
-- [ ] pnpm -F @icon-collection/vscode-extension package — .vsix 生成
+- [ ] pnpm -F icon-collection test — unit 9/9 pass
+- [ ] pnpm -F icon-collection typecheck — clean
+- [ ] pnpm -F icon-collection build — dist/{extension.cjs, webview/main.js, webview/main.css} 生成
+- [ ] pnpm -F icon-collection package — .vsix 生成
 - [ ] F5 デバッグで WebView 表示 → home で検索 → SVG コピー動作
 
 ## Follow-up (別 plan)
