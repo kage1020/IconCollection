@@ -2,6 +2,9 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+// happy-dom sets import.meta.url to an http:// URL, so fileURLToPath() cannot
+// resolve it. process.cwd() is stable under `pnpm -F @icon-collection/web test`
+// because pnpm scripts cd into the package directory before executing.
 const redirectsPath = resolve(process.cwd(), 'public/_redirects');
 
 describe('_redirects', () => {
