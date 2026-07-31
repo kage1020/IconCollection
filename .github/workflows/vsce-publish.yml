@@ -1,0 +1,44 @@
+name: vsce-publish
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: vsce
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -F icon-collection typecheck
+      - run: pnpm -F icon-collection test
+      - run: pnpm -F icon-collection build
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+      - name: Publish to Marketplace
+        env:
+          VSCE_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          pnpm -F icon-collection exec vsce publish \
+            --azure-credential
+      - name: Upload vsix artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: icon-collection-vsix
+          path: apps/vscode-extension/*.vsix
+          if-no-files-found: ignore
