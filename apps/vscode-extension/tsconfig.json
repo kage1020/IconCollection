@@ -9,5 +9,5 @@
     "verbatimModuleSyntax": false
   },
   "files": [],
-  "include": []
+  "include": ["src/extension.ts", "src/host-adapter.ts", "tests/host-adapter.test.ts"]
 }
