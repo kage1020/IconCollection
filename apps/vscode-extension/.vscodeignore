@@ -9,3 +9,5 @@ src/**
 node_modules/**
 .gitignore
 .npmignore
+CHANGELOG.md
+!CHANGELOG.md

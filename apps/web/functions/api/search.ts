@@ -52,7 +52,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
   const fts = buildFtsQuery(terms);
   if (fts.length === 0) {
     return Response.json({ hits: [], total: 0, cursor: null } satisfies SearchResponse, {
-      headers: CACHE_HEADERS,
+      headers: { 'cache-control': 'no-store' },
     });
   }
 

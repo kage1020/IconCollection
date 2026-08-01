@@ -125,4 +125,12 @@ describe('sanitizeApiBaseUrl', () => {
     );
     expect(sanitizeApiBaseUrl('https://example.com<script>')).toBe('https://icons.kage1020.com');
   });
+
+  it('drops userinfo (user:pass@) from the returned origin', () => {
+    expect(sanitizeApiBaseUrl('https://user:pass@example.com')).toBe('https://example.com');
+  });
+
+  it('preserves IPv6 origin', () => {
+    expect(sanitizeApiBaseUrl('https://[::1]:8443')).toBe('https://[::1]:8443');
+  });
 });

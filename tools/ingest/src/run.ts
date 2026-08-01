@@ -1,4 +1,6 @@
-import { collectFromIconify } from './collect.ts';
+import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import { type CollectFromIconifyInput, collectFromIconify } from './collect.ts';
 import { D1Client } from './d1.ts';
 import { detectChanges, readIconifyVersion } from './detect.ts';
 import { R2Client } from './r2.ts';
@@ -8,13 +10,21 @@ import { seedIcons } from './seed-icons.ts';
 import { seedCollectionMeta } from './seed-meta.ts';
 import { seedSynonyms } from './seed-synonyms.ts';
 import { syncSnapshotsToR2 } from './sync-r2.ts';
-import type { CollectionSnapshot, IngestConfig, IngestReport } from './types.ts';
+import type { CollectionSnapshot, IconifyJSON, IngestConfig, IngestReport } from './types.ts';
+
+const require = createRequire(import.meta.url);
+
+const iconifyLoader = async (collection: string): Promise<IconifyJSON> => {
+  const jsonPath = require.resolve(`@iconify/json/json/${collection}.json`);
+  const raw = await readFile(jsonPath, 'utf-8');
+  return JSON.parse(raw) as IconifyJSON;
+};
 
 export type RunDeps = {
   r2?: R2Client;
   d1?: D1Client;
   readVersion?: () => Promise<string>;
-  collect?: (collection: string, version: string) => Promise<CollectionSnapshot>;
+  collect?: (input: CollectFromIconifyInput) => Promise<CollectionSnapshot>;
 };
 
 export const run = async (config: IngestConfig, deps: RunDeps = {}): Promise<IngestReport> => {
@@ -47,7 +57,7 @@ export const run = async (config: IngestConfig, deps: RunDeps = {}): Promise<Ing
 
   const snapshots: CollectionSnapshot[] = [];
   for (const collection of changed) {
-    snapshots.push(await collect(collection, currentVersion));
+    snapshots.push(await collect({ collection, load: iconifyLoader }));
   }
 
   await syncSnapshotsToR2({ r2, snapshots, dryRun: config.dryRun });

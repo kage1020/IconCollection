@@ -13,8 +13,6 @@
       "!**/.astro",
       "!**/.wrangler",
       "!**/coverage",
-      "!**/parsers",
-      "!**/extension",
       "!apps/vscode-extension/images",
       "!apps/vscode-extension/.vscode-test"
     ]
@@ -42,6 +40,11 @@
       "quoteStyle": "single",
       "semicolons": "always",
       "trailingCommas": "all"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "overrides": [

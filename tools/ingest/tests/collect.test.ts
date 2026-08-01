@@ -1,9 +1,20 @@
+import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import type { IconifyJSON } from '@iconify/types';
 import { describe, expect, test } from 'vitest';
 import { collectFromIconify, collectFromPath } from '../src/collect.ts';
 
 const fixture = (name: string): string =>
   fileURLToPath(new URL(`../__fixtures__/${name}`, import.meta.url));
+
+const require = createRequire(import.meta.url);
+
+const loadFromIconifyPackage = async (collection: string): Promise<IconifyJSON> => {
+  const jsonPath = require.resolve(`@iconify/json/json/${collection}.json`);
+  const raw = await readFile(jsonPath, 'utf-8');
+  return JSON.parse(raw) as IconifyJSON;
+};
 
 describe('collectFromPath', () => {
   test('reads mdi fixture and returns CollectionSnapshot with 3 icons', async () => {
@@ -25,16 +36,17 @@ describe('collectFromPath', () => {
 
 describe('collectFromIconify', () => {
   test('reads mdi from installed @iconify/json and returns a large snapshot', async () => {
-    const snap = await collectFromIconify('mdi', '2.2.400');
+    const snap = await collectFromIconify({ collection: 'mdi', load: loadFromIconifyPackage });
     expect(snap.collection).toBe('mdi');
-    expect(snap.version).toBe('2.2.400');
     expect(snap.total).toBeGreaterThan(100);
     expect(snap.license.length).toBeGreaterThan(0);
     expect(snap.body.prefix).toBe('mdi');
   });
 
   test('throws when the collection is not present in @iconify/json', async () => {
-    await expect(collectFromIconify('this-does-not-exist', '2.2.400')).rejects.toThrow();
+    await expect(
+      collectFromIconify({ collection: 'this-does-not-exist', load: loadFromIconifyPackage }),
+    ).rejects.toThrow();
   });
 
   test('extracts default width/height from Iconify JSON, falling back to 24', async () => {

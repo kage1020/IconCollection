@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:test';
+import { env } from 'cloudflare:workers';
 // `?raw` inlines the SQL text at bundle time, avoiding runtime filesystem
 // access inside the Workers sandbox (node:fs there is a virtual/isolated FS
 // and cannot read real host paths).

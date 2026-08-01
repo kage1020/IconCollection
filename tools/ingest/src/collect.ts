@@ -1,5 +1,4 @@
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import type { CollectionSnapshot, IconifyJSON } from './types.ts';
 
 type IconifyLicense = {
@@ -40,34 +39,14 @@ export const collectFromPath = async (
   return parseSnapshot(raw, version);
 };
 
-type CollectFromIconifyInput = {
+export type CollectFromIconifyInput = {
   collection: string;
   load: (collection: string) => Promise<IconifyJSON>;
 };
 
-export async function collectFromIconify(
+export const collectFromIconify = async (
   input: CollectFromIconifyInput,
-): Promise<CollectionSnapshot>;
-export async function collectFromIconify(
-  collection: string,
-  version: string,
-): Promise<CollectionSnapshot>;
-export async function collectFromIconify(
-  collectionOrInput: string | CollectFromIconifyInput,
-  version?: string,
-): Promise<CollectionSnapshot> {
-  if (typeof collectionOrInput === 'string') {
-    // Old signature: (collection: string, version: string)
-    const collection = collectionOrInput;
-    if (typeof version !== 'string') {
-      throw new Error('Version is required when passing collection as a string');
-    }
-    const require = createRequire(import.meta.url);
-    const jsonPath = require.resolve(`@iconify/json/json/${collection}.json`);
-    return collectFromPath(jsonPath, version);
-  }
-  // New signature: ({ collection, load })
-  const input = collectionOrInput;
+): Promise<CollectionSnapshot> => {
   const body = await input.load(input.collection);
   const [defaultWidth, defaultHeight] = extractDefaultDimensions(body);
   return {
@@ -79,4 +58,4 @@ export async function collectFromIconify(
     defaultHeight,
     body,
   };
-}
+};
