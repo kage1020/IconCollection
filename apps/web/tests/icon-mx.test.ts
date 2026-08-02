@@ -1,4 +1,3 @@
-import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { GET } from '../src/pages/icon/[collection]/[name].mx.ts';
 import { putIconFixture } from './setup/miniflare.ts';
@@ -15,7 +14,6 @@ const call = async (collection: string, name: string): Promise<Response> => {
   const request = new Request(`https://x/icon/${collection}/${name}.mx`);
   return GET({
     request,
-    locals: { runtime: { env } },
     params: { collection, name },
   } as unknown as Parameters<typeof GET>[0]);
 };

@@ -1,4 +1,3 @@
-import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { GET } from '../src/pages/api/search.ts';
 import { seedTestDb } from './setup/miniflare.ts';
@@ -7,7 +6,6 @@ const call = async (url: string): Promise<Response> => {
   const request = new Request(`https://x${url}`);
   return GET({
     request,
-    locals: { runtime: { env } },
     params: {},
   } as unknown as Parameters<typeof GET>[0]);
 };

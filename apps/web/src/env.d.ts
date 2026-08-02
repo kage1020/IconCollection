@@ -9,11 +9,3 @@ declare namespace Cloudflare {
 }
 
 interface Env extends Cloudflare.Env {}
-
-declare namespace App {
-  interface Locals {
-    runtime: {
-      env: Cloudflare.Env;
-    };
-  }
-}

@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import { svgToMxLibrary } from '@icon-collection/ui';
 import type { APIRoute } from 'astro';
 import { hashSha256, isUnsafeSvg, loadCollection } from '../../../lib/iconify-cache.ts';
@@ -19,8 +20,7 @@ const workerCaches = caches as unknown as WorkerCacheStorage;
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, locals, params }) => {
-  const env = locals.runtime.env;
+export const GET: APIRoute = async ({ request, params }) => {
   const cache = workerCaches.default;
   const cached = await cache.match(request);
   if (cached) return cached;

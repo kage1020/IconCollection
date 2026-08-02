@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import type { IconHit, SearchResponse } from '@icon-collection/core';
 import { buildFtsQuery, expandQuery, normalizeQuery } from '@icon-collection/core';
 import { loadDictionary } from '@icon-collection/synonyms';
@@ -32,8 +33,7 @@ const jsonError = (status: number, message: string): Response =>
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
+export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
   if (!q || normalizeQuery(q).length === 0) return jsonError(400, 'q is required');
