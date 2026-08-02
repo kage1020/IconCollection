@@ -1,12 +1,9 @@
 import type { IconHit, SearchResponse } from '@icon-collection/core';
 import { buildFtsQuery, expandQuery, normalizeQuery } from '@icon-collection/core';
 import { loadDictionary } from '@icon-collection/synonyms';
+import type { APIRoute } from 'astro';
 
 const DICTS = [loadDictionary('en'), loadDictionary('ja')] as const;
-
-type Env = {
-  DB: D1Database;
-};
 
 const MAX_LIMIT = 200;
 const DEFAULT_LIMIT = 60;
@@ -33,7 +30,10 @@ const encodeCursor = (offset: number): string =>
 const jsonError = (status: number, message: string): Response =>
   Response.json({ error: message }, { status });
 
-export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ request, locals }) => {
+  const env = locals.runtime.env;
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
   if (!q || normalizeQuery(q).length === 0) return jsonError(400, 'q is required');
