@@ -1,3 +1,8 @@
+// Note: `astro:middleware`'s `defineMiddleware` is a virtual module only resolvable
+// inside Astro's build pipeline. This test suite runs under @cloudflare/vitest-pool-workers,
+// which cannot resolve virtual modules. `defineMiddleware` is a pure type helper (no runtime
+// behavior), so exporting `onRequest` directly is semantically identical to Astro's runtime.
+
 const CSP = [
   "default-src 'self'",
   "img-src 'self' data:",
