@@ -1,7 +1,6 @@
-import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { onRequest } from '../functions/icon/[collection]/[name].svg.ts';
+import { GET } from '../src/pages/icon/[collection]/[name].svg.ts';
 import { putIconFixture } from './setup/miniflare.ts';
 
 const FIX = {
@@ -13,19 +12,12 @@ const FIX = {
 };
 
 const call = async (collection: string, name: string): Promise<Response> => {
-  const ctx = createExecutionContext();
-  const res = await onRequest({
-    request: new Request(`https://x/icon/${collection}/${name}.svg`),
-    env,
+  const request = new Request(`https://x/icon/${collection}/${name}.svg`);
+  return GET({
+    request,
+    locals: { runtime: { env } },
     params: { collection, name },
-    next: async () => new Response(),
-    data: {},
-    waitUntil: ctx.waitUntil,
-    passThroughOnException: () => undefined,
-    functionPath: `/icon/${collection}/${name}.svg`,
-  } as never);
-  await waitOnExecutionContext(ctx);
-  return res;
+  } as unknown as Parameters<typeof GET>[0]);
 };
 
 beforeEach(async () => {
