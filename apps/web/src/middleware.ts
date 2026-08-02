@@ -1,5 +1,3 @@
-type Ctx = { next: () => Promise<Response> };
-
 const CSP = [
   "default-src 'self'",
   "img-src 'self' data:",
@@ -9,7 +7,10 @@ const CSP = [
   "frame-ancestors 'none'",
 ].join('; ');
 
-export const onRequest = async ({ next }: Ctx): Promise<Response> => {
+export const onRequest = async (
+  _context: unknown,
+  next: () => Promise<Response>,
+): Promise<Response> => {
   const res = await next();
   const headers = new Headers(res.headers);
   headers.set('content-security-policy', CSP);
