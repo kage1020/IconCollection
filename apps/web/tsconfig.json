@@ -5,5 +5,5 @@
     "jsx": "preserve",
     "jsxImportSource": "preact"
   },
-  "include": ["src/**/*", "functions/**/*", "tests/**/*", "*.config.*", ".astro/types.d.ts"]
+  "include": ["src/**/*", "tests/**/*", "*.config.*", ".astro/types.d.ts"]
 }

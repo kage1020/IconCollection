@@ -4,32 +4,32 @@ Cloudflare Pages で配信する検索 UI と icon delivery API。
 
 ## Runtime
 
-- Astro 5 (SSG) + Preact islands + Tailwind CSS v4
-- Cloudflare Pages Functions (`functions/**`)
+- Astro 7 (SSR via `output: 'server'`) + Preact islands + Tailwind CSS v4
+- `@astrojs/cloudflare` adapter が Astro server endpoints (`src/pages/**`) と middleware (`src/middleware.ts`) を単一 Worker (`dist/server/entry.mjs`) にバンドル
   - `GET /api/search`
   - `GET /icon/{collection}/{name}.svg`
   - `GET /icon/{collection}/{name}.mx`
-- Bindings: `DB` (D1, `icon-collection`) / `ICONS` (R2, `icon-collection`)
+- 静的アセットは `dist/client/` に配置され Workers Assets binding 経由で配信、動的ルートは Worker が処理
+- Bindings: `DB` (D1, `icon-collection`) / `ICONS` (R2, `icon-collection`)、`env` は `import { env } from 'cloudflare:workers'` で参照
 
 ## Local development
 
 1. `pnpm -F @icon-collection/web install`
-2. `cp apps/web/.dev.vars.example apps/web/.dev.vars` (未設定でも SSG は動く)
-3. `pnpm -F @icon-collection/web dev` — Astro dev server (Functions は fetch mock 未接続、API テストは `pnpm test` を使用)
-4. `pnpm -F @icon-collection/web test` — vitest-pool-workers による Functions 統合テスト（Workers + browser の 2 プロジェクト対応）
-5. `pnpm -F @icon-collection/web build` — `dist/` を生成
-6. `pnpm -F @icon-collection/web preview` — `wrangler pages dev ./dist` で bindings 込みプレビュー
+2. `cp apps/web/.dev.vars.example apps/web/.dev.vars` (bindings を local emulate する場合)
+3. `pnpm -F @icon-collection/web dev` — Astro dev server (`platformProxy` 有効で D1/R2 を miniflare emulate)
+4. `pnpm -F @icon-collection/web test` — vitest-pool-workers による endpoint 統合テスト (Workers + browser の 2 プロジェクト対応)
+5. `pnpm -F @icon-collection/web build` — `dist/{client,server}/` を生成
+6. `cd apps/web/dist/server && pnpm dlx wrangler dev` — 生成された Worker + assets binding を local emulate
 
 ## Deploy
 
-Cloudflare Pages の Git 連携 (`master` push → auto deploy)。
+Cloudflare ダッシュボードの Git 連携で `master` push → auto deploy。
 
-Pages プロジェクト設定:
-- Build command: `pnpm -F @icon-collection/web build`
-- Output directory: `apps/web/dist` は Cloudflare Pages ダッシュボード（Git 連携デプロイ）で設定
-- Root directory: `/` (monorepo root)
-- Environment variables: なし (bindings 経由)
-- Bindings: `DB` (D1), `ICONS` (R2) をダッシュボードから登録
+プロジェクト設定 (現行):
+- Root directory: `apps/web`
+- Build command: `npm run build && npx wrangler deploy`
+- 動的ルートは Astro adapter が生成する `dist/server/entry.mjs` を Worker として、静的アセットは `dist/client/` を assets binding として deploy
+- Bindings: `DB` (D1), `ICONS` (R2) を `wrangler.jsonc` に定義
 
 ## API contract
 
