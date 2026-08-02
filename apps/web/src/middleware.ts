@@ -3,10 +3,11 @@
 // which cannot resolve virtual modules. `defineMiddleware` is a pure type helper (no runtime
 // behavior), so exporting `onRequest` directly is semantically identical to Astro's runtime.
 
-// `'unsafe-inline'` on script-src: Astro SSR injects inline scripts for hydration
-// bootstrap and island rehydration. Without allowing inline scripts the page fails
-// to render. Migrating to a nonce-based CSP requires Astro's experimental CSP
-// integration (see docs) — deferred until it stabilizes.
+// `'unsafe-inline'` on script-src is a defense-in-depth regression accepted only until
+// Astro's experimental CSP integration stabilizes — see follow-up in progress ledger.
+// The blast radius is limited by `object-src 'none'` (blocks <object>/<embed>/<applet>
+// legacy injection vectors) and `base-uri 'self'` (blocks <base> tag hijacking that
+// would otherwise reroute relative URLs to an attacker's origin).
 const CSP = [
   "default-src 'self'",
   "img-src 'self' data:",
@@ -14,6 +15,8 @@ const CSP = [
   "script-src 'self' 'unsafe-inline'",
   "connect-src 'self'",
   "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
 ].join('; ');
 
 export const onRequest = async (

@@ -9,6 +9,8 @@ describe('middleware-headers', () => {
     expect(res.headers.get('content-security-policy')).toContain(
       "script-src 'self' 'unsafe-inline'",
     );
+    expect(res.headers.get('content-security-policy')).toContain("object-src 'none'");
+    expect(res.headers.get('content-security-policy')).toContain("base-uri 'self'");
     expect(res.headers.get('x-content-type-options')).toBe('nosniff');
     expect(res.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
     expect(await res.text()).toBe('ok');
