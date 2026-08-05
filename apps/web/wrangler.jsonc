@@ -15,6 +15,16 @@
       "bucket_name": "icon-collection"
     }
   ],
+  // Astro Cloudflare adapter auto-injects a SESSION KV binding for its experimental
+  // sessions feature. We do not use sessions, but the adapter still requires the
+  // binding; explicitly point at the existing namespace so wrangler binds instead
+  // of trying to recreate it on every deploy (KV code 10014 conflict).
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "647c22408a344094b51bd6cf055deeab"
+    }
+  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
