@@ -1,11 +1,10 @@
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test, vi } from 'vitest';
 import { collectFromPath } from '../src/collect.ts';
-import type { D1Client } from '../src/d1.ts';
+import type { D1Client, D1Result } from '../src/d1.ts';
 import type { R2Client } from '../src/r2.ts';
 import { run } from '../src/run.ts';
 import type { IngestConfig } from '../src/types.ts';
-import { makeFakeBatchAtomic } from './_helpers.ts';
 
 const fixturePath = (name: string): string =>
   fileURLToPath(new URL(`../__fixtures__/${name}`, import.meta.url));
@@ -17,9 +16,17 @@ const baseConfig: IngestConfig = {
   dryRun: false,
 };
 
-const okResult = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
+const okResult: D1Result = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
 
-const fakeBatchAtomic = makeFakeBatchAtomic();
+const rowCountFromInsert = (sql: string): number => (sql.match(/\(/g)?.length ?? 0) - 1;
+
+const makeExecute = () =>
+  vi.fn(async (sql: string): Promise<D1Result> => {
+    if (/^\s*INSERT INTO (icons|synonyms)\b/i.test(sql) && !/icons_fts/.test(sql)) {
+      return { ...okResult, meta: { changes: rowCountFromInsert(sql), last_row_id: null } };
+    }
+    return okResult;
+  });
 
 describe('run', () => {
   test('performs detect -> collect -> sync-r2 -> seed-d1 and returns a report', async () => {
@@ -27,10 +34,7 @@ describe('run', () => {
       putJson: vi.fn(async () => ({ changed: true, sha256: 'x' })),
       getJson: vi.fn(async () => null),
     } as unknown as R2Client;
-    const d1 = {
-      execute: vi.fn(async () => okResult),
-      batchAtomic: vi.fn(fakeBatchAtomic),
-    } as unknown as D1Client;
+    const d1 = { execute: makeExecute() } as unknown as D1Client;
     const report = await run(baseConfig, {
       r2,
       d1,
@@ -53,10 +57,7 @@ describe('run', () => {
         key === 'meta/version.json' ? { mdi: '2.2.500', lucide: '2.2.500' } : null,
       ),
     } as unknown as R2Client;
-    const d1 = {
-      execute: vi.fn(async () => okResult),
-      batchAtomic: vi.fn(fakeBatchAtomic),
-    } as unknown as D1Client;
+    const d1 = { execute: makeExecute() } as unknown as D1Client;
     const collectSpy = vi.fn();
     const report = await run(baseConfig, {
       r2,
@@ -94,7 +95,6 @@ describe('run', () => {
           collectFromPath(fixturePath(`${collection}-mini.json`), '2.2.500'),
       },
     );
-    // schema apply may still run, but no INSERT INTO icons
     expect(executed.some((s) => s.startsWith('INSERT INTO icons '))).toBe(false);
     expect(executed.some((s) => s.startsWith('DELETE FROM icons'))).toBe(false);
   });
@@ -109,12 +109,11 @@ describe('run', () => {
       getJson: vi.fn(async () => null),
     } as unknown as R2Client;
     const d1 = {
-      execute: vi.fn(async () => okResult),
-      batchAtomic: vi.fn(async (stmts: readonly { sql: string }[]) => {
-        if (stmts.some((s) => s.sql.startsWith('INSERT INTO icons '))) {
+      execute: vi.fn(async (sql: string) => {
+        if (/^\s*INSERT INTO icons\b/i.test(sql) && !/icons_fts/.test(sql)) {
           throw new Error('boom');
         }
-        return stmts.map(() => okResult);
+        return okResult;
       }),
     } as unknown as D1Client;
     await expect(
@@ -145,7 +144,6 @@ describe('run', () => {
         }
         return okResult;
       }),
-      batchAtomic: vi.fn(fakeBatchAtomic),
     } as unknown as D1Client;
     await run(baseConfig, {
       r2,

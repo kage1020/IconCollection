@@ -41,13 +41,19 @@ export class D1Client {
   }
 
   async execute(sql: string, params?: readonly unknown[]): Promise<D1Result> {
+    // Cloudflare D1 HTTP `/query` rejects `params` on multi-statement SQL (7400).
+    // Omit the `params` key entirely when there is nothing to bind so callers can
+    // send `;`-joined multi-statement scripts (all values inlined as SQL literals)
+    // through the same execute() path.
+    const payload: { sql: string; params?: readonly unknown[] } = { sql };
+    if (params && params.length > 0) payload.params = params;
     const res = await this.fetchImpl(this.endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.cfg.apiToken}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ sql, params: params ?? [] }),
+      body: JSON.stringify(payload),
     });
     const body = (await res.json()) as D1Response;
     if (!res.ok || !body.success) {
@@ -66,40 +72,19 @@ export class D1Client {
     return first;
   }
 
-  // Cloudflare D1 HTTP `/query` accepts a single `{ sql, params }` object with the
-  // sql field carrying multiple `;`-separated statements. Bind params are shared
-  // across all statements, positioned by `?` placeholders in appearance order. The
-  // response's `result` array contains one entry per executed statement.
+  // Cloudflare D1 HTTP `/query` does not support params + multi-statement together
+  // (code 7400 "params with multiple statements is not supported"). Atomic batching
+  // is only available via the Workers `env.DB.batch(...)` binding, which is not
+  // reachable from Node.js. This helper falls back to serial execution — each
+  // statement gets its own HTTP request. For rebuild-style ingest, a partial
+  // failure is self-healing on the next run (DELETE + re-INSERT).
   async batchAtomic(
     statements: readonly { sql: string; params?: readonly unknown[] }[],
   ): Promise<D1Result[]> {
-    if (statements.length === 0) return [];
-    const sql = statements.map((s) => s.sql).join('; ');
-    const params: unknown[] = [];
+    const results: D1Result[] = [];
     for (const stmt of statements) {
-      if (stmt.params) params.push(...stmt.params);
+      results.push(await this.execute(stmt.sql, stmt.params));
     }
-    const res = await this.fetchImpl(this.endpoint, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.cfg.apiToken}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ sql, params }),
-    });
-    const body = (await res.json()) as D1Response;
-    if (!res.ok || !body.success) {
-      throw new D1Error({
-        status: res.status,
-        errors: body.errors ?? [{ code: -1, message: 'unknown' }],
-      });
-    }
-    if (!body.result || body.result.length !== statements.length) {
-      throw new D1Error({
-        status: res.status,
-        errors: [{ code: -3, message: `result count mismatch: expected ${statements.length}` }],
-      });
-    }
-    return body.result;
+    return results;
   }
 }

@@ -1,7 +1,11 @@
 import type { D1Client } from './d1.ts';
+import { sqlLiteral } from './sql-literal.ts';
 import type { CollectionSnapshot, IconifyJSON } from './types.ts';
 
-const DEFAULT_BATCH_SIZE = 10;
+// Rows per INSERT statement. D1 HTTP has no hard bind-param ceiling here (we inline
+// values as SQL literals), so this is bounded only by request-body size. 2000 rows
+// at ~200 chars/row ≈ 400 KB per request — well under D1's 100 MB body limit.
+const DEFAULT_BATCH_SIZE = 2000;
 
 type IconMeta = {
   categories: string | null;
@@ -37,10 +41,8 @@ const buildIndex = (body: IconifyJSON): Map<string, IconMeta> => {
   return index;
 };
 
-const buildInsertSql = (rowCount: number): string => {
-  const placeholders = Array.from({ length: rowCount }, () => '(?, ?, ?, ?, ?, ?, ?)').join(', ');
-  return `INSERT INTO icons (collection, name, license, categories, tags, aliases, updated_at) VALUES ${placeholders}`;
-};
+const buildInsertSql = (rows: readonly string[]): string =>
+  `INSERT INTO icons (collection, name, license, categories, tags, aliases, updated_at) VALUES ${rows.join(', ')}`;
 
 export type SeedIconsInput = {
   d1: D1Client;
@@ -58,29 +60,30 @@ export const seedIcons = async (
     const index = buildIndex(snap.body);
     const names = Object.keys(snap.body.icons);
     const updatedAt = Math.floor(Date.now() / 1000);
-    const statements: { sql: string; params: readonly unknown[] }[] = [
-      { sql: 'DELETE FROM icons WHERE collection = ?', params: [snap.collection] },
-    ];
+
+    await input.d1.execute(`DELETE FROM icons WHERE collection = ${sqlLiteral(snap.collection)}`);
+    deleted++;
+
+    if (names.length === 0) continue;
+
     for (let offset = 0; offset < names.length; offset += batchSize) {
       const chunk = names.slice(offset, offset + batchSize);
-      const params: unknown[] = [];
-      for (const name of chunk) {
+      const rows = chunk.map((name) => {
         const meta = index.get(name);
-        params.push(
-          snap.collection,
-          name,
-          snap.license,
-          meta?.categories ?? null,
-          meta?.tags ?? null,
-          meta?.aliases ?? null,
-          updatedAt,
-        );
-      }
-      statements.push({ sql: buildInsertSql(chunk.length), params });
+        const values = [
+          sqlLiteral(snap.collection),
+          sqlLiteral(name),
+          sqlLiteral(snap.license),
+          sqlLiteral(meta?.categories ?? null),
+          sqlLiteral(meta?.tags ?? null),
+          sqlLiteral(meta?.aliases ?? null),
+          sqlLiteral(updatedAt),
+        ].join(', ');
+        return `(${values})`;
+      });
+      const result = await input.d1.execute(buildInsertSql(rows));
+      inserted += result.meta.changes;
     }
-    const results = await input.d1.batchAtomic(statements);
-    deleted++;
-    inserted += results.slice(1).reduce((n, r) => n + r.meta.changes, 0);
   }
   return { deleted, inserted };
 };
