@@ -2,10 +2,11 @@ import type { D1Client } from './d1.ts';
 import { sqlLiteral } from './sql-literal.ts';
 import type { CollectionSnapshot, IconifyJSON } from './types.ts';
 
-// Rows per INSERT statement. D1 HTTP has no hard bind-param ceiling here (we inline
-// values as SQL literals), so this is bounded only by request-body size. 2000 rows
-// at ~200 chars/row ≈ 400 KB per request — well under D1's 100 MB body limit.
-const DEFAULT_BATCH_SIZE = 2000;
+// Rows per INSERT statement. Bounded by D1's per-statement size limit
+// (SQLITE_LIMIT_SQL_LENGTH, roughly 100 KB). At ~100 chars/row this gives ~50 KB
+// per statement, leaving comfortable margin. Empirically 2000 rows already trips
+// "SQLITE_TOOBIG" for verbose collections like MDI.
+const DEFAULT_BATCH_SIZE = 500;
 
 type IconMeta = {
   categories: string | null;

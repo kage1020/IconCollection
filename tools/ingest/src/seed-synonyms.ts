@@ -3,7 +3,7 @@ import type { D1Client } from './d1.ts';
 import { sqlLiteral } from './sql-literal.ts';
 
 // Rows per INSERT statement (see seed-icons.ts for rationale).
-const DEFAULT_BATCH_SIZE = 2000;
+const DEFAULT_BATCH_SIZE = 500;
 
 const buildInsertSql = (rows: readonly string[]): string =>
   `INSERT INTO synonyms (term, expansion, lang, weight) VALUES ${rows.join(', ')}`;
