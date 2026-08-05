@@ -41,13 +41,19 @@ export class D1Client {
   }
 
   async execute(sql: string, params?: readonly unknown[]): Promise<D1Result> {
+    // Cloudflare D1 HTTP `/query` rejects `params` on multi-statement SQL (7400).
+    // Omit the `params` key entirely when there is nothing to bind so callers can
+    // send `;`-joined multi-statement scripts (all values inlined as SQL literals)
+    // through the same execute() path.
+    const payload: { sql: string; params?: readonly unknown[] } = { sql };
+    if (params && params.length > 0) payload.params = params;
     const res = await this.fetchImpl(this.endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.cfg.apiToken}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ sql, params: params ?? [] }),
+      body: JSON.stringify(payload),
     });
     const body = (await res.json()) as D1Response;
     if (!res.ok || !body.success) {

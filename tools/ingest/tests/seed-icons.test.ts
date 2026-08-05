@@ -1,8 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
-import type { D1Client } from '../src/d1.ts';
+import type { D1Client, D1Result } from '../src/d1.ts';
 import { seedIcons } from '../src/seed-icons.ts';
 import type { CollectionSnapshot } from '../src/types.ts';
-import { makeFakeBatchAtomic } from './_helpers.ts';
 
 const snap = (): CollectionSnapshot => ({
   collection: 'mdi',
@@ -28,44 +27,46 @@ const snap = (): CollectionSnapshot => ({
   } as CollectionSnapshot['body'],
 });
 
-const okResult = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
+const okResult: D1Result = { success: true, meta: { changes: 0, last_row_id: null }, results: [] };
 
-const fakeBatchAtomic = makeFakeBatchAtomic();
+const rowCountFromInsert = (sql: string): number => (sql.match(/\(/g)?.length ?? 0) - 1;
+
+const makeExecute = () =>
+  vi.fn(async (sql: string): Promise<D1Result> => {
+    if (/^\s*INSERT\b/i.test(sql)) {
+      return { ...okResult, meta: { changes: rowCountFromInsert(sql), last_row_id: null } };
+    }
+    return okResult;
+  });
 
 describe('seedIcons', () => {
-  test('deletes then inserts icons for each collection via a single atomic batch', async () => {
-    const batchAtomic = vi.fn(fakeBatchAtomic);
-    const execute = vi.fn(async () => okResult);
-    const client = { execute, batchAtomic } as unknown as D1Client;
+  test('DELETEs then INSERTs icons for each collection via serial execute calls', async () => {
+    const execute = makeExecute();
+    const client = { execute } as unknown as D1Client;
     const result = await seedIcons({ d1: client, snapshots: [snap()] });
     expect(result.deleted).toBe(1);
     expect(result.inserted).toBe(3);
-    expect(batchAtomic).toHaveBeenCalledTimes(1);
-    const statements = batchAtomic.mock.calls[0]?.[0] as ReadonlyArray<{ sql: string }>;
-    expect(statements[0]?.sql.startsWith('DELETE FROM icons')).toBe(true);
-    expect(statements.some((s) => s.sql.startsWith('INSERT INTO icons'))).toBe(true);
-    expect(execute).not.toHaveBeenCalled();
+    const calls = execute.mock.calls.map((c) => c[0] as string);
+    expect(calls[0]).toMatch(/^DELETE FROM icons WHERE collection = 'mdi'/);
+    expect(calls.slice(1).every((s) => /^INSERT INTO icons/.test(s))).toBe(true);
   });
 
-  test('uses batchAtomic to combine DELETE and INSERT per collection', async () => {
-    const batchAtomic = vi.fn(async (stmts: unknown[]) =>
-      stmts.map(() => ({ success: true, meta: { changes: 1, last_row_id: null }, results: [] })),
-    );
-    const execute = vi.fn(async () => ({
-      success: true,
-      meta: { changes: 0, last_row_id: null },
-      results: [],
-    }));
-    const d1 = { execute, batchAtomic } as unknown as D1Client;
-    await seedIcons({ d1, snapshots: [snap()] });
-    expect(batchAtomic).toHaveBeenCalled();
-    const firstBatch = batchAtomic.mock.calls[0]?.[0] as ReadonlyArray<{ sql: string }>;
-    expect(firstBatch[0]?.sql).toContain('DELETE FROM icons');
+  test('inlines collection name as SQL literal in DELETE, escaping single quotes', async () => {
+    const execute = makeExecute();
+    const client = { execute } as unknown as D1Client;
+    const dangerous: CollectionSnapshot = {
+      ...snap(),
+      collection: "mdi's",
+      body: { prefix: 'x', icons: {} } as CollectionSnapshot['body'],
+    };
+    await seedIcons({ d1: client, snapshots: [dangerous] });
+    const firstSql = execute.mock.calls[0]?.[0];
+    expect(firstSql).toBe("DELETE FROM icons WHERE collection = 'mdi''s'");
   });
 
-  test('splits large collections into batches of batchSize rows within one statement array', async () => {
-    const batchAtomic = vi.fn(fakeBatchAtomic);
-    const client = { batchAtomic } as unknown as D1Client;
+  test('splits large collections into batches of batchSize rows per INSERT', async () => {
+    const execute = makeExecute();
+    const client = { execute } as unknown as D1Client;
     const icons: Record<string, { body: string }> = {};
     for (let i = 0; i < 1200; i++) icons[`i${i}`] = { body: '<path/>' };
     const big: CollectionSnapshot = {
@@ -78,54 +79,42 @@ describe('seedIcons', () => {
       body: { prefix: 'big', icons } as CollectionSnapshot['body'],
     };
     await seedIcons({ d1: client, snapshots: [big], batchSize: 500 });
-    const statements = batchAtomic.mock.calls[0]?.[0] as ReadonlyArray<{ sql: string }>;
-    const inserts = statements.filter((s) => s.sql.startsWith('INSERT INTO icons'));
-    // 1200 / 500 = 3 insert batches, plus the leading DELETE = 4 statements total
-    expect(inserts.length).toBe(3);
-    expect(statements.length).toBe(4);
+    const insertCalls = execute.mock.calls
+      .map((c) => c[0] as string)
+      .filter((s) => /^INSERT INTO icons/.test(s));
+    // 1200 rows / 500 per batch = 3 INSERT statements
+    expect(insertCalls).toHaveLength(3);
+    expect(rowCountFromInsert(insertCalls[0] ?? '')).toBe(500);
+    expect(rowCountFromInsert(insertCalls[1] ?? '')).toBe(500);
+    expect(rowCountFromInsert(insertCalls[2] ?? '')).toBe(200);
   });
 
-  test('encodes categories and aliases as CSV strings, or null when absent', async () => {
-    const batchAtomic = vi.fn(fakeBatchAtomic);
-    const client = { batchAtomic } as unknown as D1Client;
+  test('encodes categories and aliases as CSV strings, NULL when absent', async () => {
+    const execute = makeExecute();
+    const client = { execute } as unknown as D1Client;
     await seedIcons({ d1: client, snapshots: [snap()] });
-    const statements = batchAtomic.mock.calls[0]?.[0] as ReadonlyArray<{
-      sql: string;
-      params: unknown[];
-    }>;
-    const insertParams = statements
-      .filter((s) => s.sql.startsWith('INSERT INTO icons'))
-      .flatMap((s) => s.params);
-    // parameter layout per row: collection, name, license, categories, tags, aliases, updated_at
-    const home = insertParams.slice(0, 7);
-    expect(home[0]).toBe('mdi');
-    expect(home[1]).toBe('home');
-    expect(home[3]).toBe('Navigation');
-    expect(home[5]).toBe('house');
-    const account = insertParams.slice(7, 14);
-    expect(account[3]).toBe('People');
-    expect(account[5]).toBeNull();
+    const insertSql =
+      execute.mock.calls.map((c) => c[0] as string).find((s) => /^INSERT INTO icons/.test(s)) ?? '';
+    // home row carries the alias 'house' and category 'Navigation'
+    expect(insertSql).toContain("'mdi', 'home', 'Apache-2.0', 'Navigation', NULL, 'house'");
+    // account row: category 'People', no aliases
+    expect(insertSql).toContain("'mdi', 'account', 'Apache-2.0', 'People', NULL, NULL");
+    // search row: no category, no alias
+    expect(insertSql).toContain("'mdi', 'search', 'Apache-2.0', NULL, NULL, NULL");
   });
 
-  test('default batchSize keeps bind params under 100 per statement', async () => {
-    const batchAtomic = vi.fn(fakeBatchAtomic);
-    const client = { batchAtomic } as unknown as D1Client;
-    const icons: Record<string, { body: string }> = {};
-    for (let i = 0; i < 50; i++) icons[`i${i}`] = { body: '<path/>' };
-    const snap: CollectionSnapshot = {
-      collection: 'test',
-      version: '1',
-      license: 'MIT',
-      total: 50,
-      defaultWidth: 24,
-      defaultHeight: 24,
-      body: { prefix: 'test', icons } as CollectionSnapshot['body'],
+  test('skips INSERT phase when a collection has zero icons', async () => {
+    const execute = makeExecute();
+    const client = { execute } as unknown as D1Client;
+    const empty: CollectionSnapshot = {
+      ...snap(),
+      body: { prefix: 'mdi', icons: {} } as CollectionSnapshot['body'],
     };
-    await seedIcons({ d1: client, snapshots: [snap] });
-    const statements = batchAtomic.mock.calls[0]?.[0] as ReadonlyArray<{
-      sql: string;
-      params: unknown[];
-    }>;
-    for (const s of statements) expect(s.params.length).toBeLessThanOrEqual(100);
+    const result = await seedIcons({ d1: client, snapshots: [empty] });
+    expect(result.deleted).toBe(1);
+    expect(result.inserted).toBe(0);
+    expect(execute).toHaveBeenCalledTimes(1);
+    const firstSql = (execute.mock.calls[0]?.[0] as string) ?? '';
+    expect(firstSql.startsWith('DELETE FROM icons')).toBe(true);
   });
 });

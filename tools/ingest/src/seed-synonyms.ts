@@ -1,12 +1,12 @@
 import { loadDictionary, type SynonymDictionary } from '@icon-collection/synonyms';
 import type { D1Client } from './d1.ts';
+import { sqlLiteral } from './sql-literal.ts';
 
-const DEFAULT_BATCH_SIZE = 20;
+// Rows per INSERT statement (see seed-icons.ts for rationale).
+const DEFAULT_BATCH_SIZE = 2000;
 
-const buildInsertSql = (rowCount: number): string => {
-  const placeholders = Array.from({ length: rowCount }, () => '(?, ?, ?, ?)').join(', ');
-  return `INSERT INTO synonyms (term, expansion, lang, weight) VALUES ${placeholders}`;
-};
+const buildInsertSql = (rows: readonly string[]): string =>
+  `INSERT INTO synonyms (term, expansion, lang, weight) VALUES ${rows.join(', ')}`;
 
 export type SeedSynonymsInput = {
   d1: D1Client;
@@ -18,18 +18,25 @@ export const seedSynonyms = async (input: SeedSynonymsInput): Promise<{ inserted
   const batchSize = input.batchSize ?? DEFAULT_BATCH_SIZE;
   const dicts = input.dictionaries ?? [loadDictionary('ja'), loadDictionary('en')];
   const entries = dicts.flatMap((d) => Array.from(d));
-  const statements: { sql: string; params: readonly unknown[] }[] = [
-    { sql: 'DELETE FROM synonyms', params: [] },
-  ];
+
+  await input.d1.execute('DELETE FROM synonyms');
+
+  if (entries.length === 0) return { inserted: 0 };
+
+  let inserted = 0;
   for (let offset = 0; offset < entries.length; offset += batchSize) {
     const chunk = entries.slice(offset, offset + batchSize);
-    const params: unknown[] = [];
-    for (const entry of chunk) {
-      params.push(entry.term, entry.expansion, entry.lang, entry.weight ?? 1.0);
-    }
-    statements.push({ sql: buildInsertSql(chunk.length), params });
+    const rows = chunk.map((entry) => {
+      const values = [
+        sqlLiteral(entry.term),
+        sqlLiteral(entry.expansion),
+        sqlLiteral(entry.lang),
+        sqlLiteral(entry.weight ?? 1.0),
+      ].join(', ');
+      return `(${values})`;
+    });
+    const result = await input.d1.execute(buildInsertSql(rows));
+    inserted += result.meta.changes;
   }
-  const results = await input.d1.batchAtomic(statements);
-  const inserted = results.slice(1).reduce((n, r) => n + r.meta.changes, 0);
   return { inserted };
 };
