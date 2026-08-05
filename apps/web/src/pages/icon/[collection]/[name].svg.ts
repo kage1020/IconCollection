@@ -1,7 +1,6 @@
-import { hashSha256, isUnsafeSvg, loadCollection } from '../../../src/lib/iconify-cache.ts';
-
-type Env = { ICONS: R2Bucket };
-type Ctx = { request: Request; env: Env; params: { collection: string; name: string } };
+import { env } from 'cloudflare:workers';
+import type { APIRoute } from 'astro';
+import { hashSha256, isUnsafeSvg, loadCollection } from '../../../lib/iconify-cache.ts';
 
 // `lib.dom.d.ts`'s `CacheStorage` (pulled in for browser-side Astro/Preact code
 // elsewhere in this app) shadows the Workers runtime's `caches` global, which
@@ -18,12 +17,15 @@ type WorkerCacheStorage = {
 };
 const workerCaches = caches as unknown as WorkerCacheStorage;
 
-export const onRequest = async ({ request, env, params }: Ctx): Promise<Response> => {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ request, params }) => {
   const cache = workerCaches.default;
   const cached = await cache.match(request);
   if (cached) return cached;
 
-  const { collection, name } = params;
+  const collection = params.collection ?? '';
+  const name = params.name ?? '';
   const json = await loadCollection(env, collection);
   if (!json) return new Response('not found', { status: 404 });
   const icon = json.icons[name];

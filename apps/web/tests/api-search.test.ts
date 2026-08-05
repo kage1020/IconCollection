@@ -1,24 +1,13 @@
-import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
-import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { onRequest } from '../functions/api/search.ts';
+import { GET } from '../src/pages/api/search.ts';
 import { seedTestDb } from './setup/miniflare.ts';
 
 const call = async (url: string): Promise<Response> => {
-  const req = new Request(`https://x${url}`);
-  const ctx = createExecutionContext();
-  const res = await onRequest({
-    request: req,
-    env,
+  const request = new Request(`https://x${url}`);
+  return GET({
+    request,
     params: {},
-    next: async () => new Response(),
-    data: {},
-    waitUntil: ctx.waitUntil,
-    passThroughOnException: () => undefined,
-    functionPath: '/api/search',
-  } as never);
-  await waitOnExecutionContext(ctx);
-  return res;
+  } as unknown as Parameters<typeof GET>[0]);
 };
 
 beforeEach(() => seedTestDb());
