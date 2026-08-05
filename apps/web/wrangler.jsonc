@@ -6,8 +6,7 @@
     {
       "binding": "DB",
       "database_name": "icon-collection",
-      "database_id": "20d8d7b6-c217-4ae9-8825-4807e0242fcc",
-      "remote": true
+      "database_id": "20d8d7b6-c217-4ae9-8825-4807e0242fcc"
     }
   ],
   "r2_buckets": [
