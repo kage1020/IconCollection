@@ -79,10 +79,10 @@ describe('D1Client.batchAtomic', () => {
     ]);
     expect(results.map((r) => r.meta.changes)).toEqual([3, 1]);
     const body = JSON.parse((seen[0] as { body: string }).body);
-    expect(Array.isArray(body)).toBe(true);
-    expect(body).toHaveLength(2);
-    expect(body[0].sql).toBe('DELETE FROM icons WHERE collection = ?');
-    expect(body[1].params).toEqual([1, 'mdi', 'home', 'Apache-2.0', 100]);
+    expect(body.sql).toBe(
+      'DELETE FROM icons WHERE collection = ?; INSERT INTO icons (id, collection, name, license, updated_at) VALUES (?, ?, ?, ?, ?)',
+    );
+    expect(body.params).toEqual(['mdi', 1, 'mdi', 'home', 'Apache-2.0', 100]);
   });
 
   test('throws D1Error on non-success', async () => {

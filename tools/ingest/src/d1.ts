@@ -66,17 +66,26 @@ export class D1Client {
     return first;
   }
 
+  // Cloudflare D1 HTTP `/query` accepts a single `{ sql, params }` object with the
+  // sql field carrying multiple `;`-separated statements. Bind params are shared
+  // across all statements, positioned by `?` placeholders in appearance order. The
+  // response's `result` array contains one entry per executed statement.
   async batchAtomic(
     statements: readonly { sql: string; params?: readonly unknown[] }[],
   ): Promise<D1Result[]> {
     if (statements.length === 0) return [];
+    const sql = statements.map((s) => s.sql).join('; ');
+    const params: unknown[] = [];
+    for (const stmt of statements) {
+      if (stmt.params) params.push(...stmt.params);
+    }
     const res = await this.fetchImpl(this.endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.cfg.apiToken}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify(statements.map((s) => ({ sql: s.sql, params: s.params ?? [] }))),
+      body: JSON.stringify({ sql, params }),
     });
     const body = (await res.json()) as D1Response;
     if (!res.ok || !body.success) {
