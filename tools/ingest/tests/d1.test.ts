@@ -51,20 +51,17 @@ describe('D1Client.execute', () => {
 });
 
 describe('D1Client.batchAtomic', () => {
-  test('posts statements as JSON array and returns per-statement results', async () => {
-    const seen: unknown[] = [];
-    const fetchImpl = async (url: string, init?: RequestInit) => {
-      seen.push({ url, body: init?.body });
-      return new Response(
-        JSON.stringify({
-          success: true,
-          result: [
-            { success: true, meta: { changes: 3, last_row_id: null }, results: [] },
-            { success: true, meta: { changes: 1, last_row_id: 42 }, results: [] },
-          ],
-        }),
-        { status: 200 },
-      );
+  test('sends one HTTP request per statement and returns per-statement results', async () => {
+    const seen: { body: string }[] = [];
+    let call = 0;
+    const responses = [
+      { success: true, meta: { changes: 3, last_row_id: null }, results: [] },
+      { success: true, meta: { changes: 1, last_row_id: 42 }, results: [] },
+    ];
+    const fetchImpl = async (_url: string, init?: RequestInit) => {
+      seen.push({ body: init?.body as string });
+      const result = responses[call++];
+      return new Response(JSON.stringify({ success: true, result: [result] }), { status: 200 });
     };
     const client = new D1Client(
       { apiToken: 't', accountId: 'a', databaseId: 'd' },
@@ -78,11 +75,13 @@ describe('D1Client.batchAtomic', () => {
       },
     ]);
     expect(results.map((r) => r.meta.changes)).toEqual([3, 1]);
-    const body = JSON.parse((seen[0] as { body: string }).body);
-    expect(body.sql).toBe(
-      'DELETE FROM icons WHERE collection = ?; INSERT INTO icons (id, collection, name, license, updated_at) VALUES (?, ?, ?, ?, ?)',
-    );
-    expect(body.params).toEqual(['mdi', 1, 'mdi', 'home', 'Apache-2.0', 100]);
+    expect(seen).toHaveLength(2);
+    const first = JSON.parse(seen[0]?.body ?? '');
+    expect(first.sql).toBe('DELETE FROM icons WHERE collection = ?');
+    expect(first.params).toEqual(['mdi']);
+    const second = JSON.parse(seen[1]?.body ?? '');
+    expect(second.sql).toContain('INSERT INTO icons');
+    expect(second.params).toEqual([1, 'mdi', 'home', 'Apache-2.0', 100]);
   });
 
   test('throws D1Error on non-success', async () => {
