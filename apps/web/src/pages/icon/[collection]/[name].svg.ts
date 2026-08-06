@@ -35,7 +35,12 @@ export const GET: APIRoute = async ({ request, params }) => {
 
   const width = icon.width ?? json.width ?? 24;
   const height = icon.height ?? json.height ?? 24;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">${icon.body}</svg>`;
+  // `width="1em"` / `height="1em"` gives a sensible intrinsic size when the SVG
+  // is embedded via `<img>` or referenced without an explicit CSS size — the
+  // icon scales with the surrounding `font-size`. Inline consumers can still
+  // override via CSS (e.g. `[&_svg]:h-full`) because inline styles beat
+  // presentational attributes at layout time.
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 ${width} ${height}">${icon.body}</svg>`;
   const etag = `"sha256:${await hashSha256(svg)}"`;
   const res = new Response(svg, {
     headers: {
