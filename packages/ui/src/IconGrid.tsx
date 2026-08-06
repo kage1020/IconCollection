@@ -6,26 +6,40 @@ export type IconGridProps = {
   columns?: number;
   cellSize?: number;
   onSelect?: (hit: IconHit) => void;
+  selectedKey?: string;
 };
 
-// virtua の VGrid による仮想スクロールは Web ビルドで有効化する予定。
-// テスト環境（happy-dom）では layout 情報が乏しく仮想化が機能しないため、
-// 非仮想の CSS grid を既定とする。
-export const IconGrid = ({ hits, columns = 6, cellSize = 64, onSelect }: IconGridProps) => {
+// Virtualisation via virtua's VGrid is planned for the web build. In the test
+// environment (happy-dom) layout metrics are unreliable and virtualisation
+// misbehaves, so we default to a non-virtualised CSS grid.
+//
+// When callers pass an explicit `columns`, we honour it (this preserves the
+// unit-test contract). Without one, we let the grid reflow responsively based
+// on `cellSize` — icon walls look better wide than in a fixed 6-column strip.
+export const IconGrid = ({
+  hits,
+  columns,
+  cellSize = 88,
+  onSelect,
+  selectedKey,
+}: IconGridProps) => {
+  const style =
+    typeof columns === 'number'
+      ? { gridTemplateColumns: `repeat(${columns}, minmax(0, ${cellSize}px))` }
+      : { gridTemplateColumns: `repeat(auto-fill, minmax(${cellSize}px, 1fr))` };
   return (
-    <div
-      class="grid gap-2"
-      style={{
-        gridTemplateColumns: `repeat(${columns}, minmax(0, ${cellSize}px))`,
-      }}
-    >
-      {hits.map((hit) => (
-        <IconCell
-          key={`${hit.collection}/${hit.name}`}
-          hit={hit}
-          {...(onSelect ? { onSelect } : {})}
-        />
-      ))}
+    <div class="grid gap-2 sm:gap-3" style={style}>
+      {hits.map((hit) => {
+        const key = `${hit.collection}/${hit.name}`;
+        return (
+          <IconCell
+            key={key}
+            hit={hit}
+            selected={selectedKey === key}
+            {...(onSelect ? { onSelect } : {})}
+          />
+        );
+      })}
     </div>
   );
 };
