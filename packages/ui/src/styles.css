@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+/*
+ * Tailwind v4 auto-detection skips symlinked node_modules paths, which is
+ * exactly how this package resolves inside consumers (`apps/web` etc.).
+ * Declare our own source root so classes used in these components are
+ * emitted into the consumer's compiled CSS.
+ */
+@source "./**/*.{ts,tsx}";
