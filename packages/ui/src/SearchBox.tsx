@@ -59,7 +59,7 @@ export const SearchBox = ({
       </span>
       <input
         type="search"
-        class="block w-full rounded-2xl border border-neutral-200 bg-white/80 py-3.5 pl-12 pr-12 text-base shadow-sm outline-none backdrop-blur transition placeholder:text-neutral-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-neutral-800 dark:bg-neutral-900/70 dark:placeholder:text-neutral-500 dark:focus:border-sky-500 dark:focus:ring-sky-500/20"
+        class="block w-full appearance-none rounded-2xl border border-neutral-200 bg-white/80 py-3.5 pl-12 pr-12 text-base shadow-sm outline-none backdrop-blur transition placeholder:text-neutral-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-neutral-800 dark:bg-neutral-900/70 dark:placeholder:text-neutral-500 dark:focus:border-sky-500 dark:focus:ring-sky-500/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
         value={value}
         placeholder={placeholder}
         onInput={(e) => {
