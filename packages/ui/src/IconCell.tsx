@@ -9,13 +9,14 @@ const sanitizeSvg = (body: string): string =>
 export type IconCellProps = {
   hit: IconHit;
   onSelect?: (hit: IconHit) => void;
+  selected?: boolean;
 };
 
 type CellStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 const cacheKey = (h: IconHit) => `${h.collection}/${h.name}`;
 
-export const IconCell = ({ hit, onSelect }: IconCellProps) => {
+export const IconCell = ({ hit, onSelect, selected = false }: IconCellProps) => {
   const host = useHost();
   const client = host.apiClient;
   const [status, setStatus] = useState<CellStatus>(() =>
@@ -51,27 +52,41 @@ export const IconCell = ({ hit, onSelect }: IconCellProps) => {
     return () => observer.disconnect();
   }, [status, client, hit.collection, hit.name]);
 
+  const base =
+    'group relative flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border bg-white p-2 text-neutral-700 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-neutral-900 dark:text-neutral-200 dark:focus-visible:ring-offset-neutral-950';
+  const state = selected
+    ? 'border-sky-500 ring-2 ring-sky-400 ring-offset-2 ring-offset-neutral-50 dark:ring-offset-neutral-950'
+    : 'border-neutral-200 dark:border-neutral-800';
+
   return (
     <button
       ref={containerRef}
       type="button"
-      class="flex aspect-square flex-col items-center justify-center rounded border border-neutral-200 p-2 hover:border-neutral-400"
+      class={`${base} ${state}`}
       aria-label={`${hit.collection}/${hit.name}`}
+      aria-pressed={selected}
       onClick={() => onSelect?.(hit)}
     >
-      {status === 'ready' && svg ? (
-        <span
-          class="h-8 w-8 [&_svg]:h-full [&_svg]:w-full"
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
-      ) : status === 'error' ? (
-        <span role="img" aria-label="failed" class="text-neutral-400">
-          ?
-        </span>
-      ) : (
-        <span aria-busy class="h-8 w-8 animate-pulse rounded bg-neutral-100" />
-      )}
-      <span class="mt-1 truncate text-[10px] text-neutral-500">{hit.name}</span>
+      <span class="flex flex-1 items-center justify-center [font-size:2rem] leading-none">
+        {status === 'ready' && svg ? (
+          <span
+            class="block h-8 w-8 text-neutral-800 transition-colors group-hover:text-sky-600 dark:text-neutral-100 dark:group-hover:text-sky-400 [&_svg]:h-full [&_svg]:w-full"
+            dangerouslySetInnerHTML={{ __html: svg }}
+          />
+        ) : status === 'error' ? (
+          <span role="img" aria-label="failed" class="text-neutral-400">
+            ?
+          </span>
+        ) : (
+          <span
+            aria-busy
+            class="h-8 w-8 animate-pulse rounded bg-neutral-100 dark:bg-neutral-800"
+          />
+        )}
+      </span>
+      <span class="w-full truncate text-center text-[10px] text-neutral-500 dark:text-neutral-400">
+        {hit.name}
+      </span>
     </button>
   );
 };

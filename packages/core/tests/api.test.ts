@@ -31,8 +31,8 @@ describe('search', () => {
     const url = fetchFn.mock.calls[0]?.[0] as URL;
     expect(url.pathname).toBe('/api/search');
     expect(url.searchParams.get('q')).toBe('home');
-    expect(url.searchParams.get('collection')).toBe('mdi,lucide');
-    expect(url.searchParams.get('license')).toBe('MIT');
+    expect(url.searchParams.getAll('collection')).toEqual(['mdi', 'lucide']);
+    expect(url.searchParams.getAll('license')).toEqual(['MIT']);
     expect(url.searchParams.get('limit')).toBe('30');
   });
 

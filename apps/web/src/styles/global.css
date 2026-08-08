@@ -1,2 +1,11 @@
 @import "tailwindcss";
 @import "@icon-collection/ui/styles.css";
+
+/*
+ * pnpm resolves `@icon-collection/ui` as a symlinked node_modules entry,
+ * which Tailwind v4's auto-detection skips. Redeclare the source paths
+ * from the consumer so the JIT emits every class referenced inside the
+ * shared UI package, independent of whether `@source` propagates through
+ * `@import`ed CSS in the current Tailwind version.
+ */
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";

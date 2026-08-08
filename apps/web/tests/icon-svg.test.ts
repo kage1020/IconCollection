@@ -32,6 +32,8 @@ describe('GET /icon/{collection}/{name}.svg', () => {
     const body = await res.text();
     expect(body).toContain('viewBox="0 0 24 24"');
     expect(body).toContain('xmlns="http://www.w3.org/2000/svg"');
+    expect(body).toContain('width="1em"');
+    expect(body).toContain('height="1em"');
     expect(body).toContain('<path d="M0 0h24v24H0z"/>');
   });
 
