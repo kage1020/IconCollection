@@ -39,12 +39,12 @@ export const createApiClient = (config: ApiClientConfig): ApiClient => {
     search: async (query) => {
       const url = buildUrl(config.baseUrl, 'api/search');
       url.searchParams.set('q', query.q);
-      if (query.collection?.length) {
-        url.searchParams.set('collection', query.collection.join(','));
-      }
-      if (query.license?.length) {
-        url.searchParams.set('license', query.license.join(','));
-      }
+      // Repeat the parameter once per value (`?collection=a&collection=b`)
+      // so the server's `getAll('collection')` sees each collection as a
+      // separate string. Comma-joining would push `"a,b"` as a single
+      // literal into the SQL `IN (...)` list and match zero rows.
+      for (const c of query.collection ?? []) url.searchParams.append('collection', c);
+      for (const l of query.license ?? []) url.searchParams.append('license', l);
       if (typeof query.limit === 'number') {
         url.searchParams.set('limit', String(query.limit));
       }
