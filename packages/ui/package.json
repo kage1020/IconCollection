@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@icon-collection/core": "workspace:^",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.17",
     "preact": "^10.29.7",
     "virtua": "^0.49.3"
   },
